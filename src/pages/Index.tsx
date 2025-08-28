@@ -168,8 +168,7 @@ const Index = () => {
   };
 
   const handleReadMore = (lessonId: string) => {
-    // This would navigate to a lesson detail page
-    console.log("Navigate to lesson:", lessonId);
+    window.location.href = `/lesson/${lessonId}`;
   };
 
   if (isLoading) {

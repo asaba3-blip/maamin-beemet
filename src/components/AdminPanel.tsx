@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { User } from "@supabase/supabase-js";
-import { Upload, FileText, Edit, Trash2, Eye } from "lucide-react";
+import { Upload, FileText, Edit, Trash2, Eye, Image } from "lucide-react";
+import mammoth from "mammoth";
 
 interface Topic {
   id: string;
@@ -47,6 +48,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
   const [topicId, setTopicId] = useState("");
   const [published, setPublished] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
     fetchTopics();
@@ -113,10 +116,40 @@ export function AdminPanel({ user }: AdminPanelProps) {
     }
   };
 
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type.startsWith("image/")) {
+        setImageFile(file);
+        setImageUrl(URL.createObjectURL(file));
+        toast({
+          title: "תמונה נבחרה",
+          description: `נבחרה: ${file.name}`,
+        });
+      } else {
+        toast({
+          title: "שגיאה",
+          description: "אנא בחר קובץ תמונה",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   const processWordFile = async (file: File): Promise<string> => {
-    // In a real implementation, you would use a library like mammoth.js to convert Word to HTML
-    // For now, we'll simulate this by returning the file name as content
-    return `תוכן מקובץ: ${file.name}\n\nכאן יופיע התוכן המעובד מקובץ ה-Word לאחר המרה.`;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      return result.value;
+    } catch (error) {
+      console.error("Error processing Word file:", error);
+      toast({
+        title: "שגיאה",
+        description: "לא ניתן לעבד את קובץ ה-Word",
+        variant: "destructive",
+      });
+      return "";
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -130,6 +163,34 @@ export function AdminPanel({ user }: AdminPanelProps) {
       if (selectedFile) {
         finalContent = await processWordFile(selectedFile);
         setContent(finalContent);
+        toast({
+          title: "קובץ Word עובד",
+          description: "התוכן הועתק מקובץ ה-Word אוטומטית",
+        });
+      }
+
+      let uploadedImageUrl = imageUrl;
+
+      // Upload image if selected
+      if (imageFile) {
+        const fileName = `lesson-${Date.now()}-${imageFile.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('lesson-images')
+          .upload(fileName, imageFile);
+
+        if (uploadError) {
+          console.error("Error uploading image:", uploadError);
+          toast({
+            title: "שגיאה",
+            description: "לא ניתן להעלות את התמונה",
+            variant: "destructive",
+          });
+        } else {
+          const { data: { publicUrl } } = supabase.storage
+            .from('lesson-images')
+            .getPublicUrl(fileName);
+          uploadedImageUrl = publicUrl;
+        }
       }
 
       const lessonData = {
@@ -138,6 +199,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
         content: finalContent,
         topic_id: topicId || null,
         published,
+        image_url: uploadedImageUrl || null,
       };
 
       if (editingLesson) {
@@ -172,6 +234,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
       setTopicId("");
       setPublished(false);
       setSelectedFile(null);
+      setImageFile(null);
+      setImageUrl("");
       setEditingLesson(null);
       
       // Refresh lessons
@@ -300,23 +364,48 @@ export function AdminPanel({ user }: AdminPanelProps) {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="file-upload">העלאת קובץ Word</Label>
-              <div className="flex items-center gap-4">
-                <Input
-                  id="file-upload"
-                  type="file"
-                  accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                  onChange={handleFileSelect}
-                  className="flex-1"
-                />
-                <Upload className="h-5 w-5 text-muted-foreground" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="image-upload">תמונה לשיעור</Label>
+                <div className="flex items-center gap-4">
+                  <Input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="flex-1"
+                  />
+                  <Image className="h-5 w-5 text-muted-foreground" />
+                </div>
+                {imageUrl && (
+                  <div className="mt-2">
+                    <img 
+                      src={imageUrl} 
+                      alt="תצוגה מקדימה" 
+                      className="h-32 w-auto rounded-lg object-cover"
+                    />
+                  </div>
+                )}
               </div>
-              {selectedFile && (
-                <p className="text-sm text-muted-foreground">
-                  קובץ נבחר: {selectedFile.name}
-                </p>
-              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="file-upload">העלאת קובץ Word (אוטומטי)</Label>
+                <div className="flex items-center gap-4">
+                  <Input
+                    id="file-upload"
+                    type="file"
+                    accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    onChange={handleFileSelect}
+                    className="flex-1"
+                  />
+                  <Upload className="h-5 w-5 text-muted-foreground" />
+                </div>
+                {selectedFile && (
+                  <p className="text-sm text-muted-foreground">
+                    קובץ נבחר: {selectedFile.name} - התוכן יועתק אוטומטית
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -356,6 +445,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
                     setTopicId("");
                     setPublished(false);
                     setSelectedFile(null);
+                    setImageFile(null);
+                    setImageUrl("");
                   }}
                 >
                   ביטול
