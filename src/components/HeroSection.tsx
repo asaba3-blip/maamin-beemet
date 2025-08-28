@@ -1,23 +1,39 @@
-import heroImage from "@/assets/hero-torah.jpg";
+import heroImage from "@/assets/hero-study.jpg";
 
 export function HeroSection() {
   return (
-    <section className="relative h-80 overflow-hidden">
+    <section className="relative h-96 md:h-[500px] overflow-hidden">
       <img 
         src={heroImage} 
-        alt="תורה ולימוד יהדות"
+        alt="לימוד תורה ויהדות - חכמת הדורות"
         className="w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-l from-primary/80 via-primary/60 to-primary/40" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
       
-      <div className="absolute inset-0 flex items-center justify-center text-center">
-        <div className="text-primary-foreground max-w-2xl px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">
-            ברוכים הבאים ללימודי מקרא ויהדות
+      <div className="absolute inset-0 flex items-center justify-end text-right">
+        <div className="max-w-2xl px-8 md:px-16">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 text-foreground font-hebrew leading-tight">
+            ברוכים הבאים
+            <br />
+            <span className="text-primary">ללימודי תורה</span>
           </h1>
-          <p className="text-xl md:text-2xl opacity-90 leading-relaxed">
-            מקום למחשבה עמוקה, לימוד משמעותי וחיבור אמיתי למקורות היהדות
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8 font-hebrew">
+            מקום למחשבה עמוקה, לימוד משמעותי וחיבור אמיתי למקורות החכמה היהודית
           </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-end">
+            <a 
+              href="/auth" 
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors text-center"
+            >
+              התחבר ללימוד
+            </a>
+            <a 
+              href="#lessons" 
+              className="border border-border bg-background/80 text-foreground px-6 py-3 rounded-lg font-medium hover:bg-muted transition-colors text-center"
+            >
+              צפה בשיעורים
+            </a>
+          </div>
         </div>
       </div>
     </section>
