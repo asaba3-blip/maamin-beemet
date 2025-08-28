@@ -8,6 +8,8 @@ import { TopicsMenu } from "@/components/TopicsMenu";
 import { LessonCard } from "@/components/LessonCard";
 import { AdminPanel } from "@/components/AdminPanel";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 import lesson1Image from "@/assets/lesson1.jpg";
 import lesson2Image from "@/assets/lesson2.jpg";
 import lesson3Image from "@/assets/lesson3.jpg";
@@ -61,13 +63,34 @@ const Index = () => {
   const [topics, setTopics] = useState<any[]>([]);
   const [realLessons, setRealLessons] = useState<any[]>([]);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [siteSettings, setSiteSettings] = useState<any>({});
 
   useEffect(() => {
+    fetchSiteSettings();
     if (user) {
       fetchLessons();
       fetchTopics();
     }
   }, [user]);
+
+  const fetchSiteSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*');
+
+      if (error) throw error;
+
+      const settingsMap = data?.reduce((acc, setting) => {
+        acc[setting.setting_key] = setting.setting_value;
+        return acc;
+      }, {}) || {};
+
+      setSiteSettings(settingsMap);
+    } catch (error) {
+      console.error('Error fetching site settings:', error);
+    }
+  };
 
   const fetchTopics = async () => {
     const { data, error } = await supabase
@@ -171,6 +194,13 @@ const Index = () => {
     window.location.href = `/lesson/${lessonId}`;
   };
 
+  // Update document title with dynamic site title
+  useEffect(() => {
+    if (siteSettings.site_title) {
+      document.title = siteSettings.site_title;
+    }
+  }, [siteSettings.site_title]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -201,67 +231,67 @@ const Index = () => {
         }}
       />
       
-      <HeroSection />
-      
-      <div className="container max-w-7xl mx-auto px-4 py-8">
-        {user && isAdmin && (
-          <div className="mb-6 text-center">
-            <button
-              onClick={() => setShowAdmin(true)}
-              className="text-primary hover:underline"
-            >
-              עבור לפאנל הניהול
-            </button>
-          </div>
-        )}
-        
+      <HeroSection 
+        title={siteSettings.hero_title || "ברוכים הבאים ללימודי תורה"}
+        subtitle={siteSettings.hero_subtitle || "מקום למחשבה עמוקה, לימוד משמעותי וחיבור אמיתי למקורות החכמה היהודית"}
+      />
+
+      {/* Admin Message */}
+      {siteSettings.admin_message_enabled === 'true' && siteSettings.admin_message && (
+        <div className="container mx-auto px-4 py-6">
+          <Alert className="bg-primary/10 border-primary/20">
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-right" dir="rtl">
+              {siteSettings.admin_message}
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
+      <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Topics Menu */}
+          {/* Topics Sidebar */}
           <div className="lg:col-span-1">
             <TopicsMenu 
               selectedTopic={selectedTopic}
               onTopicSelect={setSelectedTopic}
-              topics={user ? topics : undefined}
+              topics={topics}
             />
           </div>
-          
-          {/* Lessons Grid */}
+
+          {/* Main Content */}
           <div className="lg:col-span-3">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-right mb-2">
-                {selectedTopic ? `שיעורים בנושא: ${selectedTopic}` : "כל השיעורים"}
-              </h2>
-              <p className="text-muted-foreground text-right">
-                {filteredLessons.length} שיעורים נמצאו
+            <div className="mb-8">
+              <h2 id="lessons" className="text-3xl font-bold mb-4 text-center">שיעורים אחרונים</h2>
+              <p className="text-muted-foreground text-center mb-8">
+                {filteredLessons.length} שיעורים זמינים
               </p>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredLessons.map((lesson) => (
-                <LessonCard
-                  key={lesson.id}
-                  lesson={lesson}
-                  onLike={handleLike}
-                  onReadMore={handleReadMore}
-                />
-              ))}
-            </div>
-            
-            {filteredLessons.length === 0 && (
+
+            {filteredLessons.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-muted-foreground text-lg">
-                  {displayLessons.length === 0 
-                    ? "עדיין לא נוספו שיעורים" 
-                    : "לא נמצאו שיעורים התואמים את החיפוש שלך"
-                  }
+                <p className="text-muted-foreground mb-4">
+                  {searchQuery || selectedTopic ? "לא נמצאו שיעורים התואמים את החיפוש" : "עדיין לא הועלו שיעורים"}
                 </p>
                 {!user && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    <Link to="/auth" className="text-primary hover:underline">
-                      התחבר
-                    </Link> כדי לראות את כל השיעורים
-                  </p>
+                  <Link 
+                    to="/auth" 
+                    className="text-primary hover:underline"
+                  >
+                    התחבר כדי לראות שיעורים נוספים
+                  </Link>
                 )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredLessons.map((lesson) => (
+                  <LessonCard
+                    key={lesson.id}
+                    lesson={lesson}
+                    onLike={handleLike}
+                    onReadMore={handleReadMore}
+                  />
+                ))}
               </div>
             )}
           </div>

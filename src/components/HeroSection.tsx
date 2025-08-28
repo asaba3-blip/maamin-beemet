@@ -1,6 +1,14 @@
 import heroImage from "@/assets/hero-study.jpg";
 
-export function HeroSection() {
+interface HeroSectionProps {
+  title?: string;
+  subtitle?: string;
+}
+
+export function HeroSection({ 
+  title = "ברוכים הבאים ללימודי תורה", 
+  subtitle = "מקום למחשבה עמוקה, לימוד משמעותי וחיבור אמיתי למקורות החכמה היהודית" 
+}: HeroSectionProps) {
   return (
     <section className="relative h-96 md:h-[500px] overflow-hidden">
       <img 
@@ -13,12 +21,10 @@ export function HeroSection() {
       <div className="absolute inset-0 flex items-center justify-end text-right">
         <div className="max-w-2xl px-8 md:px-16">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 text-foreground font-hebrew leading-tight">
-            ברוכים הבאים
-            <br />
-            <span className="text-primary">ללימודי תורה</span>
+            {title}
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8 font-hebrew">
-            מקום למחשבה עמוקה, לימוד משמעותי וחיבור אמיתי למקורות החכמה היהודית
+            {subtitle}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-end">
             <a 

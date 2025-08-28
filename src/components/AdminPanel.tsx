@@ -9,11 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { User } from "@supabase/supabase-js";
-import { Upload, FileText, Edit, Trash2, Eye, Image, Settings, BookOpen } from "lucide-react";
+import { Upload, FileText, Edit, Trash2, Eye, Image, Settings, BookOpen, Globe } from "lucide-react";
 import mammoth from "mammoth";
 import ReactQuill from "react-quill";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TopicManager } from "./TopicManager";
+import { SiteSettingsManager } from "./SiteSettingsManager";
 
 interface Topic {
   id: string;
@@ -360,7 +361,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
       </div>
 
       <Tabs defaultValue="lessons" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="lessons" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />
             ניהול שיעורים
@@ -368,6 +369,10 @@ export function AdminPanel({ user }: AdminPanelProps) {
           <TabsTrigger value="topics" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             ניהול קטגוריות
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Globe className="h-4 w-4" />
+            הגדרות האתר
           </TabsTrigger>
         </TabsList>
 
@@ -593,6 +598,10 @@ export function AdminPanel({ user }: AdminPanelProps) {
 
         <TabsContent value="topics">
           <TopicManager />
+        </TabsContent>
+
+        <TabsContent value="settings">
+          <SiteSettingsManager />
         </TabsContent>
       </Tabs>
     </div>
