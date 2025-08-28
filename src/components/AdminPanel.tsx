@@ -266,8 +266,10 @@ export function AdminPanel({ user }: AdminPanelProps) {
       setImageUrl("");
       setEditingLesson(null);
       
+      console.log("Form cleared, refreshing lessons");
       // Refresh lessons
       fetchLessons();
+      console.log("Lessons refresh called");
     } catch (error) {
       console.error("Error saving lesson:", error);
       toast({
@@ -277,16 +279,19 @@ export function AdminPanel({ user }: AdminPanelProps) {
       });
     } finally {
       setIsLoading(false);
+      console.log("Form submission finished, loading:", false);
     }
   };
 
   const handleEdit = (lesson: Lesson) => {
+    console.log("Editing lesson:", lesson);
     setEditingLesson(lesson);
     setTitle(lesson.title);
     setSummary(lesson.summary);
     setContent(lesson.content);
     setTopicId(lesson.topic_id || "");
     setPublished(lesson.published);
+    setImageUrl(lesson.image_url || "");
   };
 
   const handleDelete = async (lessonId: string) => {
