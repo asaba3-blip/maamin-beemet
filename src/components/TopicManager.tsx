@@ -9,6 +9,7 @@ import { Trash2, Edit, Plus, ChevronDown, ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Topic {
   id: string;
@@ -20,17 +21,47 @@ interface Topic {
 }
 
 export function TopicManager() {
+  const { user } = useAuth();
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicName, setTopicName] = useState("");
   const [topicDescription, setTopicDescription] = useState("");
   const [parentTopic, setParentTopic] = useState<string>("");
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [openTopics, setOpenTopics] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchTopics();
-  }, []);
+    checkAdminStatus();
+  }, [user]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchTopics();
+    }
+  }, [isAdmin]);
+
+  const checkAdminStatus = async () => {
+    try {
+      if (!user) {
+        setIsAdmin(false);
+        setIsLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .rpc('get_current_user_admin_status');
+
+      if (error) throw error;
+      setIsAdmin(data === true);
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      setIsAdmin(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fetchTopics = async () => {
     try {
@@ -276,6 +307,39 @@ export function TopicManager() {
   };
 
   const flatTopicsForSelect = getFlatTopics(hierarchicalTopics);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>טוען...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <h3 className="text-lg font-semibold mb-2">נדרש כניסה למערכת</h3>
+          <p className="text-muted-foreground">עליך להתחבר כמנהל כדי לנהל קטגוריות</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <h3 className="text-lg font-semibold mb-2">אין הרשאות גישה</h3>
+          <p className="text-muted-foreground">רק מנהלים יכולים לנהל קטגוריות</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
