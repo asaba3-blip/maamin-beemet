@@ -410,13 +410,18 @@ export function AdminPanel({ user }: AdminPanelProps) {
 
             <div className="space-y-2">
               <Label htmlFor="content">תוכן השיעור</Label>
+              <div className="text-sm text-muted-foreground mb-2">
+                ניתן להעתיק טקסט מקובץ Word עם שמירה על עיצוב (מודגש, קו תחתון וכו')
+              </div>
               <Textarea
                 id="content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="הכנס את תוכן השיעור או העלה קובץ Word"
-                rows={10}
+                placeholder="הכנס את תוכן השיעור או העתק מקובץ Word עם שמירה על עיצוב"
+                rows={15}
                 required
+                className="min-h-[400px] font-mono text-sm"
+                style={{ direction: 'rtl' }}
               />
             </div>
 

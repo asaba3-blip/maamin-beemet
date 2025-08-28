@@ -238,8 +238,9 @@ export default function LessonDetail() {
           <Card>
             <CardContent className="prose prose-lg max-w-none p-8 text-right">
               <div 
-                className="whitespace-pre-wrap leading-relaxed text-foreground"
-                dangerouslySetInnerHTML={{ __html: lesson.content.replace(/\n/g, '<br />') }}
+                className="leading-relaxed text-foreground font-hebrew"
+                style={{ direction: 'rtl' }}
+                dangerouslySetInnerHTML={{ __html: lesson.content }}
               />
             </CardContent>
           </Card>
