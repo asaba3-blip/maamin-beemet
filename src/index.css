@@ -145,3 +145,48 @@
     background: hsl(var(--primary) / 0.5);
   }
 }
+
+/* Quill RTL and Hebrew support */
+.ql-editor {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Heebo', Arial, sans-serif;
+}
+
+.ql-editor p, .ql-editor h1, .ql-editor h2, .ql-editor h3 {
+  direction: rtl;
+  text-align: right;
+}
+
+.ql-toolbar {
+  direction: ltr;
+}
+
+/* Custom RTL styles for Hebrew content */
+.hebrew-content {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Heebo', Arial, sans-serif;
+}
+
+.hebrew-content strong {
+  font-weight: 600;
+}
+
+.hebrew-content em {
+  font-style: italic;
+}
+
+.hebrew-content u {
+  text-decoration: underline;
+}
+
+.hebrew-content h1, .hebrew-content h2, .hebrew-content h3 {
+  margin: 1em 0 0.5em 0;
+  font-weight: 600;
+}
+
+.hebrew-content p {
+  margin: 0.5em 0;
+  line-height: 1.6;
+}

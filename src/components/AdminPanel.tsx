@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { User } from "@supabase/supabase-js";
 import { Upload, FileText, Edit, Trash2, Eye, Image } from "lucide-react";
 import mammoth from "mammoth";
+import ReactQuill from "react-quill";
 
 interface Topic {
   id: string;
@@ -455,16 +456,27 @@ export function AdminPanel({ user }: AdminPanelProps) {
               <div className="text-sm text-muted-foreground mb-2">
                 ניתן להעתיק טקסט מקובץ Word עם שמירה על עיצוב (מודגש, קו תחתון וכו')
               </div>
-              <Textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="הכנס את תוכן השיעור או העתק מקובץ Word עם שמירה על עיצוב"
-                rows={15}
-                required
-                className="min-h-[400px] font-mono text-sm"
-                style={{ direction: 'rtl' }}
-              />
+              <div className="border rounded-md" dir="rtl">
+                <ReactQuill
+                  value={content}
+                  onChange={setContent}
+                  placeholder="הכנס את תוכן השיעור או העתק מקובץ Word עם שמירה על עיצוב"
+                  style={{ minHeight: '400px', direction: 'rtl' }}
+                  theme="snow"
+                  modules={{
+                    toolbar: [
+                      [{ 'header': [1, 2, 3, false] }],
+                      ['bold', 'italic', 'underline', 'strike'],
+                      [{ 'color': [] }, { 'background': [] }],
+                      [{ 'align': [] }],
+                      ['blockquote', 'code-block'],
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                      ['link'],
+                      ['clean']
+                    ]
+                  }}
+                />
+              </div>
             </div>
 
             <div className="flex items-center space-x-2 space-x-reverse">
