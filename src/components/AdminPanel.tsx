@@ -20,6 +20,7 @@ interface Topic {
   id: string;
   name: string;
   description: string | null;
+  sort_order?: number;
 }
 
 interface Lesson {

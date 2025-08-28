@@ -15,6 +15,7 @@ interface Topic {
   name: string;
   description?: string;
   parent_id?: string | null;
+  sort_order?: number;
   children?: Topic[];
 }
 
