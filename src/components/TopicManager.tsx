@@ -45,18 +45,41 @@ export function TopicManager() {
   const checkAdminStatus = async () => {
     try {
       if (!user) {
+        console.log('TopicManager: No user found');
         setIsAdmin(false);
         setIsLoading(false);
         return;
       }
 
-      const { data, error } = await supabase
-        .rpc('get_current_user_admin_status');
+      console.log('TopicManager: User found:', user.id, user.email);
 
-      if (error) throw error;
-      setIsAdmin(data === true);
+      // Check if user has a profile first
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      console.log('TopicManager: Profile query result:', { profile, profileError });
+
+      if (profileError) {
+        console.error('TopicManager: Profile error:', profileError);
+        setIsAdmin(false);
+        setIsLoading(false);
+        return;
+      }
+
+      if (!profile) {
+        console.log('TopicManager: No profile found for user');
+        setIsAdmin(false);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('TopicManager: User is admin:', profile.is_admin);
+      setIsAdmin(profile.is_admin === true);
     } catch (error) {
-      console.error('Error checking admin status:', error);
+      console.error('TopicManager: Error checking admin status:', error);
       setIsAdmin(false);
     } finally {
       setIsLoading(false);
@@ -324,7 +347,8 @@ export function TopicManager() {
       <Card>
         <CardContent className="p-8 text-center">
           <h3 className="text-lg font-semibold mb-2">נדרש כניסה למערכת</h3>
-          <p className="text-muted-foreground">עליך להתחבר כמנהל כדי לנהל קטגוריות</p>
+          <p className="text-muted-foreground mb-4">עליך להתחבר כמנהל כדי לנהל קטגוריות</p>
+          <p className="text-sm text-muted-foreground">אם אתה מחובר, רענן את הדף</p>
         </CardContent>
       </Card>
     );
@@ -335,7 +359,13 @@ export function TopicManager() {
       <Card>
         <CardContent className="p-8 text-center">
           <h3 className="text-lg font-semibold mb-2">אין הרשאות גישה</h3>
-          <p className="text-muted-foreground">רק מנהלים יכולים לנהל קטגוריות</p>
+          <p className="text-muted-foreground mb-4">רק מנהלים יכולים לנהל קטגוריות</p>
+          <p className="text-sm text-muted-foreground">
+            מחובר כ: {user?.email} | מזהה: {user?.id?.substring(0, 8)}...
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            אם אתה אמור להיות מנהל, בדוק את הרשאות המשתמש במסד הנתונים
+          </p>
         </CardContent>
       </Card>
     );
