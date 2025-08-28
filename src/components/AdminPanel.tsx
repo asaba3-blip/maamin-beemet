@@ -139,7 +139,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
   const processWordFile = async (file: File): Promise<string> => {
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const result = await mammoth.extractRawText({ arrayBuffer });
+      // Extract HTML instead of raw text to preserve formatting
+      const result = await mammoth.convertToHtml({ arrayBuffer });
       return result.value;
     } catch (error) {
       console.error("Error processing Word file:", error);
@@ -308,7 +309,16 @@ export function AdminPanel({ user }: AdminPanelProps) {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">פאנל ניהול</h1>
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.href = '/'}
+            className="flex items-center gap-2"
+          >
+            ← חזרה לדף הבית
+          </Button>
+          <h1 className="text-3xl font-bold">פאנל ניהול</h1>
+        </div>
         <div className="text-sm text-muted-foreground">
           מחובר כמנהל: {user.email}
         </div>
