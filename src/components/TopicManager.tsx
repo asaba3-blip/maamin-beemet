@@ -187,6 +187,19 @@ export function TopicManager() {
       }
     });
 
+    // Sort children by sort_order for consistent display
+    const sortTopics = (topics: Topic[]) => {
+      topics.forEach(topic => {
+        if (topic.children && topic.children.length > 0) {
+          topic.children.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+          sortTopics(topic.children);
+        }
+      });
+    };
+
+    sortTopics(roots);
+    roots.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
     return roots;
   };
 
