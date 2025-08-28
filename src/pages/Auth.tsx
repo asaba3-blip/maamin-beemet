@@ -66,7 +66,18 @@ export default function Auth() {
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    await signInWithGoogle();
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) {
+        console.error("Google sign-in error:", error.message);
+        // If it's a configuration error, show helpful message
+        if (error.message.includes('provider') || error.message.includes('configuration')) {
+          alert("Google Auth לא מוגדר כרגע. אנא השתמש בהתחברות עם אימייל וסיסמה או פנה למנהל המערכת.");
+        }
+      }
+    } catch (err) {
+      console.error("Unexpected error during Google sign-in:", err);
+    }
     setIsLoading(false);
   };
 
