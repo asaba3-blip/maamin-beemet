@@ -58,17 +58,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAdminStatus = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('user_id', userId)
-        .single();
+      // Use the security definer function instead of direct table access
+      const { data, error } = await supabase.rpc('get_current_user_admin_status');
 
-      if (data) {
-        setIsAdmin(data.is_admin || false);
-      } else if (error && error.code === 'PGRST116') {
-        // Profile doesn't exist, create one
-        await createProfile(userId);
+      if (error) {
+        console.error('Error checking admin status:', error);
+        if (error.code === 'PGRST116') {
+          // Profile doesn't exist, create one
+          await createProfile(userId);
+        }
+      } else {
+        setIsAdmin(data || false);
       }
     } catch (error) {
       console.error('Error checking admin status:', error);
