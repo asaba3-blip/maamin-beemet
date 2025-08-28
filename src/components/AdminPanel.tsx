@@ -1,0 +1,428 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { User } from "@supabase/supabase-js";
+import { Upload, FileText, Edit, Trash2, Eye } from "lucide-react";
+
+interface Topic {
+  id: string;
+  name: string;
+  description: string | null;
+}
+
+interface Lesson {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  topic_id: string | null;
+  image_url: string | null;
+  published: boolean;
+  created_at: string;
+  topics?: Topic;
+}
+
+interface AdminPanelProps {
+  user: User;
+}
+
+export function AdminPanel({ user }: AdminPanelProps) {
+  const { toast } = useToast();
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+  
+  // Form state
+  const [title, setTitle] = useState("");
+  const [summary, setSummary] = useState("");
+  const [content, setContent] = useState("");
+  const [topicId, setTopicId] = useState("");
+  const [published, setPublished] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    fetchTopics();
+    fetchLessons();
+  }, []);
+
+  const fetchTopics = async () => {
+    const { data, error } = await supabase
+      .from("topics")
+      .select("*")
+      .order("name");
+
+    if (error) {
+      toast({
+        title: "שגיאה",
+        description: "לא ניתן לטעון את הנושאים",
+        variant: "destructive",
+      });
+    } else {
+      setTopics(data || []);
+    }
+  };
+
+  const fetchLessons = async () => {
+    const { data, error } = await supabase
+      .from("lessons")
+      .select(`
+        *,
+        topics (
+          id,
+          name,
+          description
+        )
+      `)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      toast({
+        title: "שגיאה",
+        description: "לא ניתן לטעון את השיעורים",
+        variant: "destructive",
+      });
+    } else {
+      setLessons(data || []);
+    }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type.includes("document") || file.name.endsWith(".docx") || file.name.endsWith(".doc")) {
+        setSelectedFile(file);
+        toast({
+          title: "קובץ נבחר",
+          description: `נבחר: ${file.name}`,
+        });
+      } else {
+        toast({
+          title: "שגיאה",
+          description: "אנא בחר קובץ Word (.doc או .docx)",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const processWordFile = async (file: File): Promise<string> => {
+    // In a real implementation, you would use a library like mammoth.js to convert Word to HTML
+    // For now, we'll simulate this by returning the file name as content
+    return `תוכן מקובץ: ${file.name}\n\nכאן יופיע התוכן המעובד מקובץ ה-Word לאחר המרה.`;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      let finalContent = content;
+
+      // Process Word file if uploaded
+      if (selectedFile) {
+        finalContent = await processWordFile(selectedFile);
+        setContent(finalContent);
+      }
+
+      const lessonData = {
+        title,
+        summary,
+        content: finalContent,
+        topic_id: topicId || null,
+        published,
+      };
+
+      if (editingLesson) {
+        const { error } = await supabase
+          .from("lessons")
+          .update(lessonData)
+          .eq("id", editingLesson.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "השיעור עודכן",
+          description: "השיעור עודכן בהצלחה",
+        });
+      } else {
+        const { error } = await supabase
+          .from("lessons")
+          .insert([lessonData]);
+
+        if (error) throw error;
+
+        toast({
+          title: "השיעור נוצר",
+          description: "השיעור נוצר בהצלחה",
+        });
+      }
+
+      // Reset form
+      setTitle("");
+      setSummary("");
+      setContent("");
+      setTopicId("");
+      setPublished(false);
+      setSelectedFile(null);
+      setEditingLesson(null);
+      
+      // Refresh lessons
+      fetchLessons();
+    } catch (error) {
+      console.error("Error saving lesson:", error);
+      toast({
+        title: "שגיאה",
+        description: "אירעה שגיאה בשמירת השיעור",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEdit = (lesson: Lesson) => {
+    setEditingLesson(lesson);
+    setTitle(lesson.title);
+    setSummary(lesson.summary);
+    setContent(lesson.content);
+    setTopicId(lesson.topic_id || "");
+    setPublished(lesson.published);
+  };
+
+  const handleDelete = async (lessonId: string) => {
+    if (!confirm("האם אתה בטוח שברצונך למחוק את השיעור?")) return;
+
+    const { error } = await supabase
+      .from("lessons")
+      .delete()
+      .eq("id", lessonId);
+
+    if (error) {
+      toast({
+        title: "שגיאה",
+        description: "לא ניתן למחוק את השיעור",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "השיעור נמחק",
+        description: "השיעור נמחק בהצלחה",
+      });
+      fetchLessons();
+    }
+  };
+
+  const togglePublished = async (lesson: Lesson) => {
+    const { error } = await supabase
+      .from("lessons")
+      .update({ published: !lesson.published })
+      .eq("id", lesson.id);
+
+    if (error) {
+      toast({
+        title: "שגיאה",
+        description: "לא ניתן לעדכן את סטטוס הפרסום",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "עודכן",
+        description: lesson.published ? "השיעור הוסר מהפרסום" : "השיעור פורסם",
+      });
+      fetchLessons();
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">פאנל ניהול</h1>
+        <div className="text-sm text-muted-foreground">
+          מחובר כמנהל: {user.email}
+        </div>
+      </div>
+
+      {/* Form for creating/editing lessons */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            {editingLesson ? "עריכת שיעור" : "יצירת שיעור חדש"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">כותרת השיעור</Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="הכנס כותרת לשיעור"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="topic">נושא</Label>
+                <Select value={topicId} onValueChange={setTopicId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="בחר נושא" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {topics.map((topic) => (
+                      <SelectItem key={topic.id} value={topic.id}>
+                        {topic.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="summary">תקציר השיעור</Label>
+              <Textarea
+                id="summary"
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                placeholder="הכנס תקציר קצר לשיעור"
+                rows={3}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="file-upload">העלאת קובץ Word</Label>
+              <div className="flex items-center gap-4">
+                <Input
+                  id="file-upload"
+                  type="file"
+                  accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  onChange={handleFileSelect}
+                  className="flex-1"
+                />
+                <Upload className="h-5 w-5 text-muted-foreground" />
+              </div>
+              {selectedFile && (
+                <p className="text-sm text-muted-foreground">
+                  קובץ נבחר: {selectedFile.name}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="content">תוכן השיעור</Label>
+              <Textarea
+                id="content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="הכנס את תוכן השיעור או העלה קובץ Word"
+                rows={10}
+                required
+              />
+            </div>
+
+            <div className="flex items-center space-x-2 space-x-reverse">
+              <Switch
+                id="published"
+                checked={published}
+                onCheckedChange={setPublished}
+              />
+              <Label htmlFor="published">פרסם מיד</Label>
+            </div>
+
+            <div className="flex gap-2">
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "שומר..." : editingLesson ? "עדכן שיעור" : "צור שיעור"}
+              </Button>
+              {editingLesson && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setEditingLesson(null);
+                    setTitle("");
+                    setSummary("");
+                    setContent("");
+                    setTopicId("");
+                    setPublished(false);
+                    setSelectedFile(null);
+                  }}
+                >
+                  ביטול
+                </Button>
+              )}
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* Lessons list */}
+      <Card>
+        <CardHeader>
+          <CardTitle>שיעורים קיימים</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {lessons.map((lesson) => (
+              <div
+                key={lesson.id}
+                className="flex items-center justify-between p-4 border rounded-lg"
+              >
+                <div className="flex-1">
+                  <h3 className="font-semibold">{lesson.title}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {lesson.topics?.name || "ללא נושא"} • {" "}
+                    {lesson.published ? "פורסם" : "טיוטה"} • {" "}
+                    {new Date(lesson.created_at).toLocaleDateString("he-IL")}
+                  </p>
+                  <p className="text-sm mt-1">{lesson.summary}</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => togglePublished(lesson)}
+                  >
+                    <Eye className="h-4 w-4" />
+                    {lesson.published ? "הסתר" : "פרסם"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(lesson)}
+                  >
+                    <Edit className="h-4 w-4" />
+                    ערוך
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDelete(lesson.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    מחק
+                  </Button>
+                </div>
+              </div>
+            ))}
+            {lessons.length === 0 && (
+              <p className="text-center text-muted-foreground py-8">
+                עדיין לא נוצרו שיעורים
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
