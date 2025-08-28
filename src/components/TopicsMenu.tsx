@@ -7,8 +7,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 interface Topic {
   id: string;
   name: string;
-  icon: any;
-  subtopics?: { id: string; name: string }[];
+  icon?: any;
+  description?: string;
+  parent_id?: string | null;
+  children?: Topic[];
 }
 
 const topics: Topic[] = [
@@ -16,35 +18,16 @@ const topics: Topic[] = [
     id: "torah",
     name: "פרשיות השבוע",
     icon: Scroll,
-    subtopics: [
-      { id: "genesis", name: "בראשית" },
-      { id: "exodus", name: "שמות" },
-      { id: "leviticus", name: "ויקרא" },
-      { id: "numbers", name: "במדבר" },
-      { id: "deuteronomy", name: "דברים" }
-    ]
   },
   {
     id: "faith",
     name: "עקרונות האמונה",
     icon: Star,
-    subtopics: [
-      { id: "principles", name: "עיקרי האמונה" },
-      { id: "prayer", name: "תפילה ועבודה" },
-      { id: "holidays", name: "מועדים וחגים" },
-      { id: "ethics", name: "מוסר ומידות" }
-    ]
   },
   {
     id: "wisdom",
     name: "ספרי חכמה",
     icon: Book,
-    subtopics: [
-      { id: "psalms", name: "תהילים" },
-      { id: "proverbs", name: "משלי" },
-      { id: "ecclesiastes", name: "קהלת" },
-      { id: "job", name: "איוב" }
-    ]
   }
 ];
 
@@ -70,6 +53,75 @@ export function TopicsMenu({ selectedTopic, onTopicSelect, topics: realTopics }:
     setOpenTopics(newOpenTopics);
   };
 
+  // Build hierarchy from flat topics array
+  const buildHierarchy = (topics: any[]): Topic[] => {
+    const topicsMap = new Map();
+    const roots: Topic[] = [];
+
+    // First pass: create all topic objects
+    topics.forEach(topic => {
+      topicsMap.set(topic.id, { ...topic, children: [] });
+    });
+
+    // Second pass: build hierarchy
+    topics.forEach(topic => {
+      const topicWithChildren = topicsMap.get(topic.id);
+      if (topic.parent_id) {
+        const parent = topicsMap.get(topic.parent_id);
+        if (parent) {
+          parent.children.push(topicWithChildren);
+        }
+      } else {
+        roots.push(topicWithChildren);
+      }
+    });
+
+    return roots;
+  };
+
+  const hierarchicalTopics = Array.isArray(displayTopics) ? buildHierarchy(displayTopics) : [];
+
+  const renderTopic = (topic: Topic, level: number = 0) => {
+    const hasChildren = topic.children && topic.children.length > 0;
+    const isOpen = openTopics.has(topic.id);
+    const paddingLeft = level * 16;
+
+    return (
+      <div key={topic.id}>
+        {hasChildren ? (
+          <Collapsible open={isOpen} onOpenChange={() => toggleTopic(topic.id)}>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full justify-between text-right h-auto py-2"
+                style={{ paddingRight: `${paddingLeft + 12}px` }}
+              >
+                <div className="flex items-center gap-2">
+                  <Book className="h-4 w-4" />
+                  <span className="text-sm">{topic.name}</span>
+                </div>
+                <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-1">
+              {topic.children?.map(child => renderTopic(child, level + 1))}
+            </CollapsibleContent>
+          </Collapsible>
+        ) : (
+          <Button
+            variant={selectedTopic === topic.name ? "secondary" : "ghost"}
+            className="w-full justify-start text-right h-auto py-2"
+            style={{ paddingRight: `${paddingLeft + 12}px` }}
+            onClick={() => onTopicSelect(topic.name)}
+          >
+            <Book className="h-4 w-4 ml-2" />
+            <span className="text-sm">{topic.name}</span>
+          </Button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Card className="h-fit shadow-card">
       <CardHeader>
@@ -84,17 +136,7 @@ export function TopicsMenu({ selectedTopic, onTopicSelect, topics: realTopics }:
           <span>כל השיעורים</span>
         </Button>
         
-        {displayTopics.map((topic) => (
-          <Button
-            key={topic.id}
-            variant={selectedTopic === topic.name ? "secondary" : "ghost"}
-            className="w-full justify-start text-right"
-            onClick={() => onTopicSelect(topic.name)}
-          >
-            <Book className="h-4 w-4 ml-2" />
-            <span>{topic.name}</span>
-          </Button>
-        ))}
+        {hierarchicalTopics.map(topic => renderTopic(topic))}
         
       </CardContent>
     </Card>
