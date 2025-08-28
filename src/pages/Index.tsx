@@ -255,7 +255,6 @@ const Index = () => {
             <TopicsMenu 
               selectedTopic={selectedTopic}
               onTopicSelect={setSelectedTopic}
-              topics={topics}
             />
           </div>
 

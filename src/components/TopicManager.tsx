@@ -36,7 +36,8 @@ export function TopicManager() {
       const { data, error } = await supabase
         .from('topics')
         .select('*')
-        .order('name');
+        .order('sort_order', { ascending: true })
+        .order('name', { ascending: true });
 
       if (error) throw error;
       setTopics(data || []);

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, ChevronLeft, Book, Scroll, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Topic {
   id: string;
@@ -13,35 +14,30 @@ interface Topic {
   children?: Topic[];
 }
 
-const topics: Topic[] = [
-  {
-    id: "torah",
-    name: "פרשיות השבוע",
-    icon: Scroll,
-  },
-  {
-    id: "faith",
-    name: "עקרונות האמונה",
-    icon: Star,
-  },
-  {
-    id: "wisdom",
-    name: "ספרי חכמה",
-    icon: Book,
-  }
-];
-
 interface TopicsMenuProps {
   selectedTopic: string | null;
   onTopicSelect: (topicId: string | null) => void;
-  topics?: any[];
 }
 
-export function TopicsMenu({ selectedTopic, onTopicSelect, topics: realTopics }: TopicsMenuProps) {
+export function TopicsMenu({ selectedTopic, onTopicSelect }: TopicsMenuProps) {
   const [openTopics, setOpenTopics] = useState<Set<string>>(new Set());
-  
-  // Use real topics if provided, otherwise fall back to demo topics
-  const displayTopics = realTopics && realTopics.length > 0 ? realTopics : topics;
+  const [topics, setTopics] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchTopics();
+  }, []);
+
+  const fetchTopics = async () => {
+    const { data: topics, error } = await supabase
+      .from("topics")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true });
+
+    if (!error && topics) {
+      setTopics(topics);
+    }
+  };
 
   const toggleTopic = (topicId: string) => {
     const newOpenTopics = new Set(openTopics);
@@ -79,7 +75,7 @@ export function TopicsMenu({ selectedTopic, onTopicSelect, topics: realTopics }:
     return roots;
   };
 
-  const hierarchicalTopics = Array.isArray(displayTopics) ? buildHierarchy(displayTopics) : [];
+  const hierarchicalTopics = Array.isArray(topics) ? buildHierarchy(topics) : [];
 
   const renderTopic = (topic: Topic, level: number = 0) => {
     const hasChildren = topic.children && topic.children.length > 0;
