@@ -1,0 +1,62 @@
+-- Add a sort_order column to topics table to properly sort Torah portions chronologically
+ALTER TABLE topics ADD COLUMN sort_order INTEGER DEFAULT 0;
+
+-- Create a mapping of Torah portions in chronological order
+UPDATE topics SET sort_order = CASE 
+  WHEN name = 'בראשית' THEN 1
+  WHEN name = 'נח' THEN 2
+  WHEN name = 'לך לך' THEN 3
+  WHEN name = 'וירא' THEN 4
+  WHEN name = 'חיי שרה' THEN 5
+  WHEN name = 'תולדות' THEN 6
+  WHEN name = 'ויצא' THEN 7
+  WHEN name = 'וישלח' THEN 8
+  WHEN name = 'וישב' THEN 9
+  WHEN name = 'מקץ' THEN 10
+  WHEN name = 'ויגש' THEN 11
+  WHEN name = 'ויחי' THEN 12
+  WHEN name = 'שמות' THEN 13
+  WHEN name = 'וארא' THEN 14
+  WHEN name = 'בא' THEN 15
+  WHEN name = 'בשלח' THEN 16
+  WHEN name = 'יתרו' THEN 17
+  WHEN name = 'משפטים' THEN 18
+  WHEN name = 'תרומה' THEN 19
+  WHEN name = 'תצוה' THEN 20
+  WHEN name = 'כי תשא' THEN 21
+  WHEN name = 'ויקהל' THEN 22
+  WHEN name = 'פקודי' THEN 23
+  WHEN name = 'ויקרא' THEN 24
+  WHEN name = 'צו' THEN 25
+  WHEN name = 'שמיני' THEN 26
+  WHEN name = 'תזריע' THEN 27
+  WHEN name = 'מצורע' THEN 28
+  WHEN name = 'אחרי מות' THEN 29
+  WHEN name = 'קדושים' THEN 30
+  WHEN name = 'אמור' THEN 31
+  WHEN name = 'בהר' THEN 32
+  WHEN name = 'בחקותי' THEN 33
+  WHEN name = 'במדבר' THEN 34
+  WHEN name = 'נשא' THEN 35
+  WHEN name = 'בהעלותך' THEN 36
+  WHEN name = 'שלח לך' THEN 37
+  WHEN name = 'קרח' THEN 38
+  WHEN name = 'חקת' THEN 39
+  WHEN name = 'בלק' THEN 40
+  WHEN name = 'פינחס' THEN 41
+  WHEN name = 'מטות' THEN 42
+  WHEN name = 'מסעי' THEN 43
+  WHEN name = 'דברים' THEN 44
+  WHEN name = 'ואתחנן' THEN 45
+  WHEN name = 'עקב' THEN 46
+  WHEN name = 'ראה' THEN 47
+  WHEN name = 'שופטים' THEN 48
+  WHEN name = 'כי תצא' THEN 49
+  WHEN name = 'כי תבוא' THEN 50
+  WHEN name = 'נצבים' THEN 51
+  WHEN name = 'וילך' THEN 52
+  WHEN name = 'האזינו' THEN 53
+  WHEN name = 'וזאת הברכה' THEN 54
+  ELSE 999
+END
+WHERE parent_id = (SELECT id FROM topics WHERE name = 'מקרא' LIMIT 1);
