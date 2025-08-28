@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
@@ -196,7 +197,8 @@ const Index = () => {
         isAdmin={isAdmin}
         onAdminToggle={() => setShowAdmin(!showAdmin)}
         onSignOut={async () => {
-          // This will be handled by the useAuth hook
+          const { signOut } = useAuth();
+          await signOut();
         }}
       />
       
@@ -256,9 +258,9 @@ const Index = () => {
                 </p>
                 {!user && (
                   <p className="text-sm text-muted-foreground mt-2">
-                    <a href="/auth" className="text-primary hover:underline">
+                    <Link to="/auth" className="text-primary hover:underline">
                       התחבר
-                    </a> כדי לראות את כל השיעורים
+                    </Link> כדי לראות את כל השיעורים
                   </p>
                 )}
               </div>

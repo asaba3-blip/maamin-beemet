@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+// import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
@@ -21,7 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const { toast } = useToast();
+  // const { toast } = useToast(); // Removed to avoid circular dependency
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -104,16 +104,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (error) {
-      toast({
-        title: "שגיאה בהרשמה",
-        description: getErrorMessage(error.message),
-        variant: "destructive",
-      });
+      console.error("שגיאה בהרשמה:", getErrorMessage(error.message));
     } else {
-      toast({
-        title: "נרשמת בהצלחה",
-        description: "אנא בדוק את האימייל שלך לאישור ההרשמה",
-      });
+      console.log("נרשמת בהצלחה - אנא בדוק את האימייל שלך לאישור ההרשמה");
     }
 
     return { error };
@@ -126,16 +119,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (error) {
-      toast({
-        title: "שגיאה בהתחברות",
-        description: getErrorMessage(error.message),
-        variant: "destructive",
-      });
+      console.error("שגיאה בהתחברות:", getErrorMessage(error.message));
     } else {
-      toast({
-        title: "התחברת בהצלחה",
-        description: "ברוך הבא לאתר",
-      });
+      console.log("התחברת בהצלחה - ברוך הבא לאתר");
     }
 
     return { error };
@@ -150,11 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (error) {
-      toast({
-        title: "שגיאה בהתחברות עם גוגל",
-        description: getErrorMessage(error.message),
-        variant: "destructive",
-      });
+      console.error("שגיאה בהתחברות עם גוגל:", getErrorMessage(error.message));
     }
 
     return { error };
@@ -163,10 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     setIsAdmin(false);
-    toast({
-      title: "התנתקת בהצלחה",
-      description: "להתראות!",
-    });
+    console.log("התנתקת בהצלחה - להתראות!");
   };
 
   const getErrorMessage = (errorMessage: string) => {
