@@ -157,6 +157,15 @@ export function AdminPanel({ user }: AdminPanelProps) {
     e.preventDefault();
     setIsLoading(true);
 
+    console.log("Form submission started", { 
+      title, 
+      summary, 
+      topicId, 
+      published, 
+      imageFile: !!imageFile,
+      selectedFile: !!selectedFile 
+    });
+
     try {
       let finalContent = content;
 
@@ -174,10 +183,13 @@ export function AdminPanel({ user }: AdminPanelProps) {
 
       // Upload image if selected
       if (imageFile) {
+        console.log("Starting image upload", { fileName: imageFile.name, size: imageFile.size });
         const fileName = `lesson-${Date.now()}-${imageFile.name}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('lesson-images')
           .upload(fileName, imageFile);
+
+        console.log("Image upload result", { uploadData, uploadError });
 
         if (uploadError) {
           console.error("Error uploading image:", uploadError);
@@ -186,11 +198,14 @@ export function AdminPanel({ user }: AdminPanelProps) {
             description: "לא ניתן להעלות את התמונה",
             variant: "destructive",
           });
+          setIsLoading(false);
+          return;
         } else {
           const { data: { publicUrl } } = supabase.storage
             .from('lesson-images')
             .getPublicUrl(fileName);
           uploadedImageUrl = publicUrl;
+          console.log("Image uploaded successfully", { publicUrl });
         }
       }
 
@@ -199,17 +214,24 @@ export function AdminPanel({ user }: AdminPanelProps) {
         summary,
         content: finalContent,
         topic_id: topicId || null,
-        published,
-        image_url: uploadedImageUrl || null,
+        image_url: uploadedImageUrl,
+        published
       };
+
+      console.log("Saving lesson data", lessonData);
 
       if (editingLesson) {
         const { error } = await supabase
           .from("lessons")
           .update(lessonData)
           .eq("id", editingLesson.id);
-
-        if (error) throw error;
+        
+        console.log("Update lesson result", { error });
+        
+        if (error) {
+          console.error("Error updating lesson:", error);
+          throw error;
+        }
 
         toast({
           title: "השיעור עודכן",
@@ -219,8 +241,13 @@ export function AdminPanel({ user }: AdminPanelProps) {
         const { error } = await supabase
           .from("lessons")
           .insert([lessonData]);
-
-        if (error) throw error;
+        
+        console.log("Insert lesson result", { error });
+        
+        if (error) {
+          console.error("Error creating lesson:", error);
+          throw error;
+        }
 
         toast({
           title: "השיעור נוצר",
