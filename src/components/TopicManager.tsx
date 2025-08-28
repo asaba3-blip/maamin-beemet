@@ -25,7 +25,7 @@ export function TopicManager() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicName, setTopicName] = useState("");
   const [topicDescription, setTopicDescription] = useState("");
-  const [parentTopic, setParentTopic] = useState<string>("");
+  const [parentTopic, setParentTopic] = useState<string>("none");
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [openTopics, setOpenTopics] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
@@ -122,7 +122,7 @@ export function TopicManager() {
       const topicData = {
         name: topicName.trim(),
         description: topicDescription.trim() || null,
-        parent_id: parentTopic || null,
+        parent_id: parentTopic && parentTopic !== "none" ? parentTopic : null,
       };
 
       if (editingTopic) {
@@ -152,7 +152,7 @@ export function TopicManager() {
 
       setTopicName("");
       setTopicDescription("");
-      setParentTopic("");
+      setParentTopic("none");
       setEditingTopic(null);
       fetchTopics();
     } catch (error) {
@@ -169,7 +169,7 @@ export function TopicManager() {
     setEditingTopic(topic);
     setTopicName(topic.name);
     setTopicDescription(topic.description || "");
-    setParentTopic(topic.parent_id || "");
+    setParentTopic(topic.parent_id || "none");
   };
 
   const handleDelete = async (topic: Topic) => {
@@ -205,7 +205,7 @@ export function TopicManager() {
     setEditingTopic(null);
     setTopicName("");
     setTopicDescription("");
-    setParentTopic("");
+    setParentTopic("none");
   };
 
   const toggleTopic = (topicId: string) => {
@@ -413,7 +413,7 @@ export function TopicManager() {
                   <SelectValue placeholder="בחר נושא אב" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">ללא נושא אב</SelectItem>
+                  <SelectItem value="none">ללא נושא אב</SelectItem>
                   {flatTopicsForSelect
                     .filter(({ topic }) => !editingTopic || topic.id !== editingTopic.id)
                     .map(({ topic, level }) => (
