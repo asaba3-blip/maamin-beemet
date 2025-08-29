@@ -1,0 +1,52 @@
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "לימודי מקרא ויהדות",
+  "alternateName": "מקור לחכמה ותורה",
+  "description": "אתר לימוד מקרא, אמונה ויהדות עם שיעורים מעמיקים ותובנות רוחניות",
+  "url": "https://yourdomain.com",
+  "logo": "https://yourdomain.com/logo.png",
+  "sameAs": [
+    "https://facebook.com/yourpage",
+    "https://twitter.com/yourhandle"
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "IL",
+    "addressLocality": "ישראל"
+  },
+  "educationalCredentialAwarded": "שיעורי תורה ויהדות",
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "שיעורים",
+    "itemListElement": [
+      {
+        "@type": "Course",
+        "name": "פרשיות השבוע",
+        "description": "שיעורים מעמיקים בפרשיות השבוע",
+        "provider": {
+          "@type": "Organization",
+          "name": "לימודי מקרא ויהדות"
+        }
+      },
+      {
+        "@type": "Course", 
+        "name": "הלכה",
+        "description": "שיעורים בהלכה יהודית",
+        "provider": {
+          "@type": "Organization",
+          "name": "לימודי מקרא ויהדות"
+        }
+      },
+      {
+        "@type": "Course",
+        "name": "חגים יהודיים", 
+        "description": "שיעורים על חגי ישראל ומועדים",
+        "provider": {
+          "@type": "Organization",
+          "name": "לימודי מקרא ויהדות"
+        }
+      }
+    ]
+  }
+}
