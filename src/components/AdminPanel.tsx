@@ -87,20 +87,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
     const { data, error } = await supabase
       .from("lessons")
       .select(`
-        *,
-        topics (
-          id,
-          name,
-          description
-        ),
-        lesson_topics (
-          topic_id,
-          topics (
-            id,
-            name,
-            description
-          )
-        )
+        *
       `)
       .order("created_at", { ascending: false });
 
