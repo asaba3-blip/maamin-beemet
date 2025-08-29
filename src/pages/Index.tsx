@@ -67,11 +67,10 @@ const Index = () => {
 
   useEffect(() => {
     fetchSiteSettings();
-    if (user) {
-      fetchLessons();
-      fetchTopics();
-    }
-  }, [user]);
+    fetchTopics();
+    fetchLessons(); // Always fetch lessons, regardless of user status
+  }, []);
+
 
   const fetchSiteSettings = async () => {
     try {
@@ -134,14 +133,14 @@ const Index = () => {
     }
   };
 
-  // Use real lessons from database if user is logged in, otherwise use demo data
-  const displayLessons = user ? realLessons : lessons;
+  // Always use real lessons from database
+  const displayLessons = realLessons.length > 0 ? realLessons : lessons;
 
   // Filter lessons based on search and topic
   const filteredLessons = displayLessons.filter((lesson) => {
     const lessonTitle = lesson.title || "";
     const lessonSummary = lesson.summary || "";
-    const lessonTopic = user ? lesson.topics?.name || "" : lesson.topic || "";
+    const lessonTopic = lesson.topics?.name || lesson.topic || "";
     
     const matchesSearch = searchQuery === "" || 
       lessonTitle.includes(searchQuery) || 
@@ -157,44 +156,33 @@ const Index = () => {
     if (!user) {
       toast({
         title: "נדרשת התחברות",
-        description: "אנא התחבר כדי לסמן שיעורים במועדפים",
+        description: "יש להתחבר כדי לאהוב שיעורים",
         variant: "destructive",
       });
       return;
     }
 
-    if (user) {
-      // Handle real likes for logged-in users
-      const { error } = await supabase
-        .from("likes")
-        .upsert({ 
-          lesson_id: lessonId, 
-          user_id: user.id 
-        }, { 
-          onConflict: "lesson_id,user_id" 
-        });
+    console.log("Liking lesson:", lessonId);
+    
+    // Handle real likes for logged-in users
+    const { error } = await supabase
+      .from("likes")
+      .upsert({ 
+        lesson_id: lessonId, 
+        user_id: user.id 
+      }, { 
+        onConflict: "lesson_id,user_id" 
+      });
 
-      if (error) {
-        console.error("Error liking lesson:", error);
-        toast({
-          title: "שגיאה",
-          description: "לא ניתן לסמן את השיעור במועדפים",
-          variant: "destructive",
-        });
-      } else {
-        fetchLessons(); // Refresh lessons
-      }
+    if (error) {
+      console.error("Error liking lesson:", error);
+      toast({
+        title: "שגיאה",
+        description: "לא ניתן לסמן את השיעור במועדפים",
+        variant: "destructive",
+      });
     } else {
-      // Handle demo likes for non-logged-in users
-      setLessons(lessons.map(lesson => 
-        lesson.id === lessonId 
-          ? { 
-              ...lesson, 
-              isLiked: !lesson.isLiked,
-              likes: lesson.isLiked ? lesson.likes - 1 : lesson.likes + 1
-            }
-          : lesson
-      ));
+      fetchLessons(); // Refresh lessons
     }
   };
 
