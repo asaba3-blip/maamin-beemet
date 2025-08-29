@@ -49,6 +49,27 @@ export type Database = {
           },
         ]
       }
+      lesson_topics: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_id: string
+          topic_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_id: string
+          topic_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          topic_id?: string
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           comments_count: number

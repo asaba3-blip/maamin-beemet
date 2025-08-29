@@ -33,6 +33,10 @@ interface Lesson {
   published: boolean;
   created_at: string;
   topics?: Topic;
+  lesson_topics?: Array<{
+    topic_id: string;
+    topics: Topic;
+  }>;
 }
 
 interface AdminPanelProps {
@@ -50,7 +54,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [content, setContent] = useState("");
-  const [topicId, setTopicId] = useState("");
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [published, setPublished] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -88,18 +92,27 @@ export function AdminPanel({ user }: AdminPanelProps) {
           id,
           name,
           description
+        ),
+        lesson_topics (
+          topic_id,
+          topics (
+            id,
+            name,
+            description
+          )
         )
       `)
       .order("created_at", { ascending: false });
 
     if (error) {
+      console.error("Error fetching lessons:", error);
       toast({
         title: "שגיאה",
         description: "לא ניתן לטעון את השיעורים",
         variant: "destructive",
       });
     } else {
-      setLessons(data || []);
+      setLessons((data as any) || []);
     }
   };
 
@@ -166,7 +179,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
     console.log("Form submission started", { 
       title, 
       summary, 
-      topicId, 
+      selectedTopics, 
       published, 
       imageFile: !!imageFile,
       selectedFile: !!selectedFile 
@@ -219,12 +232,14 @@ export function AdminPanel({ user }: AdminPanelProps) {
         title,
         summary,
         content: finalContent,
-        topic_id: topicId || null,
+        topic_id: selectedTopics.length > 0 ? selectedTopics[0] : null,
         image_url: uploadedImageUrl,
         published
       };
 
       console.log("Saving lesson data", lessonData);
+
+      let lessonId: string;
 
       if (editingLesson) {
         const { error } = await supabase
@@ -239,21 +254,33 @@ export function AdminPanel({ user }: AdminPanelProps) {
           throw error;
         }
 
+        lessonId = editingLesson.id;
+
+        // Delete existing topic associations
+        await supabase
+          .from("lesson_topics")
+          .delete()
+          .eq("lesson_id", lessonId);
+
         toast({
           title: "השיעור עודכן",
           description: "השיעור עודכן בהצלחה",
         });
       } else {
-        const { error } = await supabase
+        const { data: lessonResult, error } = await supabase
           .from("lessons")
-          .insert([lessonData]);
+          .insert([lessonData])
+          .select()
+          .single();
         
-        console.log("Insert lesson result", { error });
+        console.log("Insert lesson result", { lessonResult, error });
         
         if (error) {
           console.error("Error creating lesson:", error);
           throw error;
         }
+
+        lessonId = lessonResult.id;
 
         toast({
           title: "השיעור נוצר",
@@ -261,11 +288,28 @@ export function AdminPanel({ user }: AdminPanelProps) {
         });
       }
 
+      // Insert topic associations
+      if (selectedTopics.length > 0) {
+        const topicAssociations = selectedTopics.map(topicId => ({
+          lesson_id: lessonId,
+          topic_id: topicId
+        }));
+
+        const { error: topicsError } = await supabase
+          .from("lesson_topics")
+          .insert(topicAssociations);
+
+        if (topicsError) {
+          console.error("Error associating topics:", topicsError);
+          throw topicsError;
+        }
+      }
+
       // Reset form
       setTitle("");
       setSummary("");
       setContent("");
-      setTopicId("");
+      setSelectedTopics([]);
       setPublished(false);
       setSelectedFile(null);
       setImageFile(null);
@@ -295,13 +339,26 @@ export function AdminPanel({ user }: AdminPanelProps) {
     setTitle(lesson.title);
     setSummary(lesson.summary);
     setContent(lesson.content);
-    setTopicId(lesson.topic_id || "");
+    
+    // Set selected topics from lesson_topics
+    const topicIds = lesson.lesson_topics?.map(lt => lt.topic_id) || [];
+    if (topicIds.length === 0 && lesson.topic_id) {
+      topicIds.push(lesson.topic_id);
+    }
+    setSelectedTopics(topicIds);
+    
     setPublished(lesson.published);
     setImageUrl(lesson.image_url || "");
   };
 
   const handleDelete = async (lessonId: string) => {
     if (!confirm("האם אתה בטוח שברצונך למחוק את השיעור?")) return;
+
+    // Delete topic associations first
+    await supabase
+      .from("lesson_topics")
+      .delete()
+      .eq("lesson_id", lessonId);
 
     const { error } = await supabase
       .from("lessons")
@@ -402,19 +459,31 @@ export function AdminPanel({ user }: AdminPanelProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="topic">נושא</Label>
-                <Select value={topicId} onValueChange={setTopicId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="בחר נושא" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {topics.map((topic) => (
-                      <SelectItem key={topic.id} value={topic.id}>
-                        {topic.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>קטגוריות (ניתן לבחור מספר)</Label>
+                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border rounded">
+                  {topics.map((topic) => (
+                    <label key={topic.id} className="flex items-center space-x-2 space-x-reverse cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedTopics.includes(topic.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedTopics([...selectedTopics, topic.id]);
+                          } else {
+                            setSelectedTopics(selectedTopics.filter(id => id !== topic.id));
+                          }
+                        }}
+                        className="rounded"
+                      />
+                      <span className="text-sm">{topic.name}</span>
+                    </label>
+                  ))}
+                </div>
+                {selectedTopics.length > 0 && (
+                  <div className="text-sm text-muted-foreground">
+                    נבחרו: {selectedTopics.map(id => topics.find(t => t.id === id)?.name).join(", ")}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -524,7 +593,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
                     setTitle("");
                     setSummary("");
                     setContent("");
-                    setTopicId("");
+                    setSelectedTopics([]);
                     setPublished(false);
                     setSelectedFile(null);
                     setImageFile(null);
@@ -554,7 +623,9 @@ export function AdminPanel({ user }: AdminPanelProps) {
                 <div className="flex-1">
                   <h3 className="font-semibold">{lesson.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {lesson.topics?.name || "ללא נושא"} • {" "}
+                    {lesson.lesson_topics && lesson.lesson_topics.length > 0 
+                      ? lesson.lesson_topics.map(lt => lt.topics.name).join(", ")
+                      : lesson.topics?.name || "ללא קטגוריה"} • {" "}
                     {lesson.published ? "פורסם" : "טיוטה"} • {" "}
                     {new Date(lesson.created_at).toLocaleDateString("he-IL")}
                   </p>

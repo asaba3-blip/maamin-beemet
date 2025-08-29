@@ -114,6 +114,14 @@ const Index = () => {
           id,
           name,
           description
+        ),
+        lesson_topics (
+          topic_id,
+          topics (
+            id,
+            name,
+            description
+          )
         )
       `)
       .eq("published", true)
@@ -122,7 +130,7 @@ const Index = () => {
     if (error) {
       console.error("Error fetching lessons:", error);
     } else {
-      setRealLessons(data || []);
+      setRealLessons((data as any) || []);
     }
   };
 
