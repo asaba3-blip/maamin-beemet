@@ -20,10 +20,10 @@ export function HeroSection({
       
       <div className="absolute inset-0 flex items-center justify-end text-right">
         <div className="max-w-2xl px-8 md:px-16">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 text-foreground font-hebrew leading-tight">
+          <h1 className="text-4xl md:text-6xl font-heading font-bold mb-6 text-foreground leading-tight">
             {title}
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8 font-hebrew">
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8 font-body">
             {subtitle}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-end">

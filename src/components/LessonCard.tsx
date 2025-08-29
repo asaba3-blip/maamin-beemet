@@ -46,7 +46,7 @@ export function LessonCard({ lesson, onLike, onReadMore }: LessonCardProps) {
       </div>
       
       <CardHeader className="text-right">
-        <h3 className="text-xl font-semibold text-card-foreground group-hover:text-primary transition-colors">
+        <h3 className="text-xl font-heading font-semibold text-card-foreground group-hover:text-primary transition-colors">
           {lesson.title}
         </h3>
         <div className="flex items-center justify-end gap-4 text-sm text-muted-foreground">
@@ -64,7 +64,7 @@ export function LessonCard({ lesson, onLike, onReadMore }: LessonCardProps) {
       </CardHeader>
       
       <CardContent className="text-right">
-        <p className="text-muted-foreground leading-relaxed">{lesson.summary}</p>
+        <p className="text-muted-foreground leading-relaxed font-body">{lesson.summary}</p>
       </CardContent>
       
       <CardFooter className="flex justify-between items-center pt-4 border-t">

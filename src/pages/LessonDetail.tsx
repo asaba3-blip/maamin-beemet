@@ -186,7 +186,7 @@ export default function LessonDetail() {
           )}
 
           <header className="mb-8 text-right">
-            <h1 className="text-4xl font-bold mb-4 text-foreground">
+            <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4 text-foreground leading-tight">
               {lesson.title}
             </h1>
             
@@ -201,7 +201,7 @@ export default function LessonDetail() {
               </div>
             </div>
 
-            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6 font-body">
               {lesson.summary}
             </p>
 
@@ -238,7 +238,7 @@ export default function LessonDetail() {
           <Card>
             <CardContent className="prose prose-lg max-w-none p-8 text-right">
               <div 
-                className="leading-relaxed text-foreground font-hebrew hebrew-content"
+                className="leading-relaxed text-foreground hebrew-content content-typography"
                 style={{ direction: 'rtl' }}
                 dangerouslySetInnerHTML={{ __html: lesson.content }}
               />

@@ -19,6 +19,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
+				body: ['Heebo', 'Arial Hebrew', 'sans-serif'],
+				heading: ['Frank Ruhl Libre', 'Times New Roman', 'serif'],
 				hebrew: ['Heebo', 'Arial Hebrew', 'sans-serif'],
 			},
 			colors: {

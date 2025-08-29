@@ -4,8 +4,6 @@
 
 /* Jewish Learning Website Design System - Hebrew RTL Support */
 
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
-
 @layer base {
   :root {
     /* Hebrew-focused color palette */
@@ -111,11 +109,28 @@
   }
 
   body {
-    @apply bg-background text-foreground font-hebrew;
+    @apply bg-background text-foreground font-body;
     direction: rtl;
   }
 
-  /* Hebrew typography and RTL support */
+  /* Typography hierarchy for Hebrew content */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+
+  p, span, div, button, input, textarea, label {
+    @apply font-body;
+  }
+
+  /* Font family utilities */
+  .font-body {
+    font-family: 'Heebo', 'Arial Hebrew', sans-serif;
+  }
+
+  .font-heading {
+    font-family: 'Frank Ruhl Libre', 'Times New Roman', serif;
+  }
+
   .font-hebrew {
     font-family: 'Heebo', 'Arial Hebrew', sans-serif;
   }
@@ -153,9 +168,15 @@
   font-family: 'Heebo', Arial, sans-serif;
 }
 
-.ql-editor p, .ql-editor h1, .ql-editor h2, .ql-editor h3 {
+.ql-editor p {
+  font-family: 'Heebo', Arial, sans-serif;
+}
+
+.ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6 {
   direction: rtl;
   text-align: right;
+  font-family: 'Frank Ruhl Libre', 'Times New Roman', serif;
+  font-weight: 600;
 }
 
 .ql-toolbar {
@@ -181,12 +202,60 @@
   text-decoration: underline;
 }
 
-.hebrew-content h1, .hebrew-content h2, .hebrew-content h3 {
-  margin: 1em 0 0.5em 0;
+.hebrew-content h1, .hebrew-content h2, .hebrew-content h3, .hebrew-content h4, .hebrew-content h5, .hebrew-content h6 {
+  margin: 1.5em 0 0.8em 0;
+  font-family: 'Frank Ruhl Libre', 'Times New Roman', serif;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.hebrew-content h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.hebrew-content h2 {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.hebrew-content h3 {
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
 .hebrew-content p {
-  margin: 0.5em 0;
-  line-height: 1.6;
+  margin: 0.8em 0;
+  line-height: 1.7;
+  font-family: 'Heebo', Arial, sans-serif;
+  font-weight: 400;
+}
+
+/* Enhanced typography for better readability */
+.content-typography h1 {
+  @apply text-4xl md:text-5xl font-heading font-bold text-foreground mb-6 leading-tight;
+}
+
+.content-typography h2 {
+  @apply text-3xl md:text-4xl font-heading font-semibold text-foreground mb-5 leading-tight;
+}
+
+.content-typography h3 {
+  @apply text-2xl md:text-3xl font-heading font-semibold text-foreground mb-4 leading-tight;
+}
+
+.content-typography h4 {
+  @apply text-xl md:text-2xl font-heading font-medium text-foreground mb-3 leading-tight;
+}
+
+.content-typography p {
+  @apply text-base md:text-lg font-body text-foreground/90 mb-4 leading-relaxed;
+}
+
+.content-typography strong {
+  @apply font-semibold text-foreground;
+}
+
+.content-typography em {
+  @apply italic;
 }
