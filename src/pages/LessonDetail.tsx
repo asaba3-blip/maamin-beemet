@@ -244,6 +244,17 @@ export default function LessonDetail() {
               />
             </CardContent>
           </Card>
+
+          <div className="text-center mt-8">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/")}
+              className="gap-2"
+            >
+              <ArrowRight className="h-4 w-4" />
+              חזור לדף הבית
+            </Button>
+          </div>
         </article>
       </div>
     </div>
