@@ -108,7 +108,11 @@ const Index = () => {
     const { data, error } = await supabase
       .from("lessons")
       .select(`
-        *
+        *,
+        topics (
+          id,
+          name
+        )
       `)
       .eq("published", true)
       .order("created_at", { ascending: false });
