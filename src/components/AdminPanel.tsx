@@ -190,11 +190,10 @@ export function AdminPanel({ user }: AdminPanelProps) {
       // Upload image if selected
       if (imageFile) {
         console.log("Starting image upload", { fileName: imageFile.name, size: imageFile.size });
-        // Create a safe filename by removing non-ASCII characters and spaces
-        const safeFileName = imageFile.name
-          .replace(/[^\w\.-]/g, '') // Remove non-alphanumeric characters except dots and hyphens
-          .replace(/\s+/g, '_'); // Replace spaces with underscores
-        const fileName = `lesson-${Date.now()}-${safeFileName}`;
+        // Create a safe filename by removing Hebrew and non-ASCII characters
+        const fileExtension = imageFile.name.split('.').pop() || '';
+        const timestamp = Date.now();
+        const fileName = `lesson-${timestamp}.${fileExtension}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('lesson-images')
           .upload(fileName, imageFile);
