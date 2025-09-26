@@ -109,7 +109,7 @@ const Index = () => {
       .from("lessons")
       .select(`
         *,
-        lesson_topics (
+        lesson_topics!inner (
           topics (
             id,
             name
