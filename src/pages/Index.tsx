@@ -107,15 +107,7 @@ const Index = () => {
   const fetchLessons = async () => {
     const { data, error } = await supabase
       .from("lessons")
-      .select(`
-        *,
-        lesson_topics!inner (
-          topics (
-            id,
-            name
-          )
-        )
-      `)
+      .select("*")
       .eq("published", true)
       .order("created_at", { ascending: false });
 
@@ -134,16 +126,11 @@ const Index = () => {
     const lessonTitle = lesson.title || "";
     const lessonSummary = lesson.summary || "";
     
-    // Get lesson topics from the lesson_topics relationship
-    const lessonTopics = lesson.lesson_topics?.map((lt: any) => lt.topics?.name).filter(Boolean) || [];
-    const lessonTopicText = lessonTopics.join(" ") || lesson.topic || "";
-    
     const matchesSearch = searchQuery === "" || 
       lessonTitle.includes(searchQuery) || 
-      lessonSummary.includes(searchQuery) ||
-      lessonTopicText.includes(searchQuery);
+      lessonSummary.includes(searchQuery);
     
-    const matchesTopic = selectedTopic === null || lessonTopics.includes(selectedTopic);
+    const matchesTopic = selectedTopic === null;
     
     return matchesSearch && matchesTopic;
   });
