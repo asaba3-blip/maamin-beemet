@@ -109,9 +109,11 @@ const Index = () => {
       .from("lessons")
       .select(`
         *,
-        topics (
-          id,
-          name
+        lesson_topics (
+          topics (
+            id,
+            name
+          )
         )
       `)
       .eq("published", true)
@@ -131,14 +133,17 @@ const Index = () => {
   const filteredLessons = displayLessons.filter((lesson) => {
     const lessonTitle = lesson.title || "";
     const lessonSummary = lesson.summary || "";
-    const lessonTopic = lesson.topics?.name || lesson.topic || "";
+    
+    // Get lesson topics from the lesson_topics relationship
+    const lessonTopics = lesson.lesson_topics?.map((lt: any) => lt.topics?.name).filter(Boolean) || [];
+    const lessonTopicText = lessonTopics.join(" ") || lesson.topic || "";
     
     const matchesSearch = searchQuery === "" || 
       lessonTitle.includes(searchQuery) || 
       lessonSummary.includes(searchQuery) ||
-      lessonTopic.includes(searchQuery);
+      lessonTopicText.includes(searchQuery);
     
-    const matchesTopic = selectedTopic === null || lessonTopic === selectedTopic;
+    const matchesTopic = selectedTopic === null || lessonTopics.includes(selectedTopic);
     
     return matchesSearch && matchesTopic;
   });
