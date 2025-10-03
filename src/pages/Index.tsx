@@ -107,7 +107,15 @@ const Index = () => {
   const fetchLessons = async () => {
     const { data, error } = await supabase
       .from("lessons")
-      .select("*")
+      .select(`
+        *,
+        lesson_topics (
+          topics (
+            id,
+            name
+          )
+        )
+      `)
       .eq("published", true)
       .order("created_at", { ascending: false });
 
@@ -130,7 +138,10 @@ const Index = () => {
       lessonTitle.includes(searchQuery) || 
       lessonSummary.includes(searchQuery);
     
-    const matchesTopic = selectedTopic === null;
+    // Get lesson topics from the lesson_topics relationship
+    const lessonTopics = lesson.lesson_topics?.map((lt: any) => lt.topics?.name).filter(Boolean) || [];
+    
+    const matchesTopic = selectedTopic === null || lessonTopics.includes(selectedTopic);
     
     return matchesSearch && matchesTopic;
   });
