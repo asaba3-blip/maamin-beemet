@@ -105,40 +105,25 @@ const Index = () => {
   };
 
   const fetchLessons = async () => {
-    // Fetch lessons with their topics
-    const { data: lessonsData, error: lessonsError } = await supabase
+    const { data, error } = await supabase
       .from("lessons")
-      .select("*")
+      .select(`
+        *,
+        lesson_topics (
+          topics (
+            id,
+            name
+          )
+        )
+      `)
       .eq("published", true)
       .order("created_at", { ascending: false });
 
-    if (lessonsError) {
-      console.error("Error fetching lessons:", lessonsError);
-      return;
+    if (error) {
+      console.error("Error fetching lessons:", error);
+    } else {
+      setRealLessons((data as any) || []);
     }
-
-    // Fetch lesson topics for all lessons
-    const { data: lessonTopicsData, error: topicsError } = await supabase
-      .from("lesson_topics")
-      .select(`
-        lesson_id,
-        topics (
-          id,
-          name
-        )
-      `);
-
-    if (topicsError) {
-      console.error("Error fetching lesson topics:", topicsError);
-    }
-
-    // Merge topics into lessons
-    const lessonsWithTopics = lessonsData?.map(lesson => ({
-      ...lesson,
-      lesson_topics: lessonTopicsData?.filter(lt => lt.lesson_id === lesson.id) || []
-    })) || [];
-
-    setRealLessons(lessonsWithTopics);
   };
 
   // Always use real lessons from database
