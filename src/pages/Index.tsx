@@ -107,30 +107,43 @@ const Index = () => {
   const fetchLessons = async () => {
     let query = supabase
       .from("lessons")
-      .select(`
-        *,
-        lesson_topics (
-          topics (
-            id,
-            name
-          )
-        )
-      `);
+      .select("*");
     
     // Only filter by published for non-admin users
     if (!isAdmin) {
       query = query.eq("published", true);
     }
     
-    const { data, error } = await query.order("created_at", { ascending: false });
+    const { data: lessonsData, error: lessonsError } = await query.order("created_at", { ascending: false });
 
-    console.log("Fetched lessons:", data, "Error:", error);
-    
-    if (error) {
-      console.error("Error fetching lessons:", error);
-    } else {
-      setRealLessons((data as any) || []);
+    if (lessonsError) {
+      console.error("Error fetching lessons:", lessonsError);
+      setRealLessons([]);
+      return;
     }
+
+    // Fetch lesson topics mapping
+    const { data: lessonTopicsData } = await supabase
+      .from("lesson_topics")
+      .select("lesson_id, topic_id");
+
+    // Fetch all topics
+    const { data: topicsData } = await supabase
+      .from("topics")
+      .select("id, name");
+
+    // Map topics to lessons
+    const lessonsWithTopics = lessonsData?.map(lesson => {
+      const topicIds = lessonTopicsData?.filter(lt => lt.lesson_id === lesson.id).map(lt => lt.topic_id) || [];
+      const lessonTopics = topicsData?.filter(t => topicIds.includes(t.id)) || [];
+      
+      return {
+        ...lesson,
+        lesson_topics: lessonTopics.map(topic => ({ topics: topic }))
+      };
+    }) || [];
+
+    setRealLessons(lessonsWithTopics);
   };
 
   // Always use real lessons from database
