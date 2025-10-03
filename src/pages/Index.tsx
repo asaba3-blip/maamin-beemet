@@ -105,7 +105,7 @@ const Index = () => {
   };
 
   const fetchLessons = async () => {
-    const { data, error } = await supabase
+    let query = supabase
       .from("lessons")
       .select(`
         *,
@@ -115,10 +115,17 @@ const Index = () => {
             name
           )
         )
-      `)
-      .eq("published", true)
-      .order("created_at", { ascending: false });
+      `);
+    
+    // Only filter by published for non-admin users
+    if (!isAdmin) {
+      query = query.eq("published", true);
+    }
+    
+    const { data, error } = await query.order("created_at", { ascending: false });
 
+    console.log("Fetched lessons:", data, "Error:", error);
+    
     if (error) {
       console.error("Error fetching lessons:", error);
     } else {
