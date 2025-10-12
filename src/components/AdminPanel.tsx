@@ -60,6 +60,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
   const [relatedLessons, setRelatedLessons] = useState<string[]>([]);
   const [published, setPublished] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [processedContent, setProcessedContent] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState("");
 
@@ -106,16 +107,27 @@ export function AdminPanel({ user }: AdminPanelProps) {
     }
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const validation = validateDocumentFile(file);
       if (validation.valid) {
         setSelectedFile(file);
         toast({
-          title: "קובץ נבחר",
-          description: `נבחר: ${file.name}`,
+          title: "מעבד קובץ...",
+          description: "מעבד את קובץ ה-Word, אנא המתן...",
         });
+        
+        // Process the file immediately
+        const processedHtml = await processWordFile(file);
+        if (processedHtml) {
+          setProcessedContent(processedHtml);
+          setContent(processedHtml);
+          toast({
+            title: "קובץ Word עובד בהצלחה",
+            description: `התוכן מקובץ ${file.name} הועתק אוטומטית`,
+          });
+        }
       } else {
         toast({
           title: "שגיאה",
@@ -169,17 +181,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
     setIsLoading(true);
 
     try {
+      // Use the content that's already in the editor (which may include processed Word content)
       let finalContent = content;
-
-      // Process Word file if uploaded
-      if (selectedFile) {
-        finalContent = await processWordFile(selectedFile);
-        setContent(finalContent);
-        toast({
-          title: "קובץ Word עובד",
-          description: "התוכן הועתק מקובץ ה-Word אוטומטית",
-        });
-      }
 
       // Validate form data before submission
       const validationResult = lessonSchema.safeParse({
@@ -309,6 +312,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
       setRelatedLessons([]);
       setPublished(false);
       setSelectedFile(null);
+      setProcessedContent("");
       setImageFile(null);
       setImageUrl("");
       setEditingLesson(null);
