@@ -32,6 +32,7 @@ interface Lesson {
   image_url: string | null;
   published: boolean;
   created_at: string;
+  related_lessons?: string[];
   topics?: Topic;
   lesson_topics?: Array<{
     topic_id: string;
@@ -55,6 +56,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
   const [summary, setSummary] = useState("");
   const [content, setContent] = useState("");
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [relatedLessons, setRelatedLessons] = useState<string[]>([]);
   const [published, setPublished] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -224,7 +226,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
         content: finalContent,
         topic_id: selectedTopics.length > 0 ? selectedTopics[0] : null,
         image_url: uploadedImageUrl,
-        published
+        published,
+        related_lessons: relatedLessons
       };
 
       console.log("Saving lesson data", lessonData);
@@ -300,6 +303,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
       setSummary("");
       setContent("");
       setSelectedTopics([]);
+      setRelatedLessons([]);
       setPublished(false);
       setSelectedFile(null);
       setImageFile(null);
@@ -336,6 +340,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
       topicIds.push(lesson.topic_id);
     }
     setSelectedTopics(topicIds);
+    setRelatedLessons(lesson.related_lessons || []);
     
     setPublished(lesson.published);
     setImageUrl(lesson.image_url || "");
@@ -437,44 +442,74 @@ export function AdminPanel({ user }: AdminPanelProps) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">כותרת השיעור</Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="הכנס כותרת לשיעור"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>קטגוריות (ניתן לבחור מספר)</Label>
-                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border rounded">
-                  {topics.map((topic) => (
-                    <label key={topic.id} className="flex items-center space-x-2 space-x-reverse cursor-pointer">
+            <div className="space-y-2">
+              <Label htmlFor="title">כותרת השיעור</Label>
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="הכנס כותרת לשיעור"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>שיעורים קשורים (עד 4 שיעורים)</Label>
+              <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border rounded">
+                {lessons
+                  .filter(l => !editingLesson || l.id !== editingLesson.id)
+                  .map((lesson) => (
+                    <label key={lesson.id} className="flex items-center space-x-2 space-x-reverse cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={selectedTopics.includes(topic.id)}
+                        checked={relatedLessons.includes(lesson.id)}
                         onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedTopics([...selectedTopics, topic.id]);
-                          } else {
-                            setSelectedTopics(selectedTopics.filter(id => id !== topic.id));
+                          if (e.target.checked && relatedLessons.length < 4) {
+                            setRelatedLessons([...relatedLessons, lesson.id]);
+                          } else if (!e.target.checked) {
+                            setRelatedLessons(relatedLessons.filter(id => id !== lesson.id));
                           }
                         }}
+                        disabled={!relatedLessons.includes(lesson.id) && relatedLessons.length >= 4}
                         className="rounded"
                       />
-                      <span className="text-sm">{topic.name}</span>
+                      <span className="text-sm truncate">{lesson.title}</span>
                     </label>
                   ))}
-                </div>
-                {selectedTopics.length > 0 && (
-                  <div className="text-sm text-muted-foreground">
-                    נבחרו: {selectedTopics.map(id => topics.find(t => t.id === id)?.name).join(", ")}
-                  </div>
-                )}
               </div>
+              {relatedLessons.length > 0 && (
+                <div className="text-sm text-muted-foreground">
+                  נבחרו {relatedLessons.length} מתוך 4 שיעורים
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>קטגוריות (ניתן לבחור מספר)</Label>
+              <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border rounded">
+                {topics.map((topic) => (
+                  <label key={topic.id} className="flex items-center space-x-2 space-x-reverse cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedTopics.includes(topic.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedTopics([...selectedTopics, topic.id]);
+                        } else {
+                          setSelectedTopics(selectedTopics.filter(id => id !== topic.id));
+                        }
+                      }}
+                      className="rounded"
+                    />
+                    <span className="text-sm">{topic.name}</span>
+                  </label>
+                ))}
+              </div>
+              {selectedTopics.length > 0 && (
+                <div className="text-sm text-muted-foreground">
+                  נבחרו: {selectedTopics.map(id => topics.find(t => t.id === id)?.name).join(", ")}
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">

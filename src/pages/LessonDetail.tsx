@@ -15,6 +15,7 @@ interface Lesson {
   content: string;
   image_url: string | null;
   created_at: string;
+  related_lessons?: string[];
   topic: {
     name: string;
   };
@@ -23,12 +24,19 @@ interface Lesson {
   isLiked?: boolean;
 }
 
+interface RelatedLesson {
+  id: string;
+  title: string;
+  summary: string;
+}
+
 export default function LessonDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [relatedLessons, setRelatedLessons] = useState<RelatedLesson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -70,6 +78,19 @@ export default function LessonDetail() {
         ...lessonData,
         isLiked
       });
+
+      // Fetch related lessons if they exist
+      if (lessonData.related_lessons && lessonData.related_lessons.length > 0) {
+        const { data: relatedData } = await supabase
+          .from("lessons")
+          .select("id, title, summary")
+          .in("id", lessonData.related_lessons)
+          .eq("published", true);
+        
+        if (relatedData) {
+          setRelatedLessons(relatedData);
+        }
+      }
     } catch (err) {
       console.error("Error:", err);
     } finally {
@@ -189,6 +210,25 @@ export default function LessonDetail() {
             <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4 text-foreground leading-tight">
               {lesson.title}
             </h1>
+
+            {relatedLessons.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">שיעורים קשורים:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {relatedLessons.map((relatedLesson) => (
+                    <Button
+                      key={relatedLesson.id}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/lesson/${relatedLesson.id}`)}
+                      className="text-sm"
+                    >
+                      {relatedLesson.title}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
             
             <div className="flex items-center justify-end gap-6 text-muted-foreground mb-4">
               <div className="flex items-center gap-1">

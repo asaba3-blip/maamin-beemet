@@ -79,6 +79,7 @@ export type Database = {
           image_url: string | null
           likes_count: number
           published: boolean
+          related_lessons: string[] | null
           summary: string
           title: string
           topic_id: string | null
@@ -93,6 +94,7 @@ export type Database = {
           image_url?: string | null
           likes_count?: number
           published?: boolean
+          related_lessons?: string[] | null
           summary: string
           title: string
           topic_id?: string | null
@@ -107,6 +109,7 @@ export type Database = {
           image_url?: string | null
           likes_count?: number
           published?: boolean
+          related_lessons?: string[] | null
           summary?: string
           title?: string
           topic_id?: string | null
