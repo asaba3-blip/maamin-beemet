@@ -67,9 +67,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
 
       if (error) {
-        // Don't log sensitive errors to console
-        if (error.code === 'PGRST116') {
-          // Profile doesn't exist, create one
+        // If table doesn't exist or other error, create profile
+        if (error.code === 'PGRST116' || error.code === '42P01') {
           await createProfile(userId);
         }
         setIsAdmin(false);
