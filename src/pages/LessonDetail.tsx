@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
+import DOMPurify from 'dompurify';
 
 interface Lesson {
   id: string;
@@ -280,7 +281,12 @@ export default function LessonDetail() {
               <div 
                 className="leading-relaxed text-foreground hebrew-content content-typography"
                 style={{ direction: 'rtl' }}
-                dangerouslySetInnerHTML={{ __html: lesson.content }}
+                dangerouslySetInnerHTML={{ 
+                  __html: DOMPurify.sanitize(lesson.content, {
+                    ALLOWED_TAGS: ['p', 'br', 'b', 'i', 'u', 'strong', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'blockquote', 'code', 'pre', 'span', 'div'],
+                    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style']
+                  })
+                }}
               />
             </CardContent>
           </Card>

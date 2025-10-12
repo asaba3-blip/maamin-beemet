@@ -58,8 +58,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAdminStatus = async (userId: string) => {
     try {
-      // Use the security definer function instead of direct table access
-      const { data, error } = await supabase.rpc('get_current_user_admin_status');
+      // Check if user has admin role in user_roles table
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .maybeSingle();
 
       if (error) {
         console.error('Error checking admin status:', error);
@@ -68,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await createProfile(userId);
         }
       } else {
-        setIsAdmin(data || false);
+        setIsAdmin(!!data);
       }
     } catch (error) {
       console.error('Error checking admin status:', error);
@@ -80,8 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase
         .from('profiles')
         .insert([{
-          user_id: userId,
-          is_admin: false
+          user_id: userId
         }]);
 
       if (error) {

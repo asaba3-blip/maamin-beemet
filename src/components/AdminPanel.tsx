@@ -165,15 +165,6 @@ export function AdminPanel({ user }: AdminPanelProps) {
     e.preventDefault();
     setIsLoading(true);
 
-    console.log("Form submission started", { 
-      title, 
-      summary, 
-      selectedTopics, 
-      published, 
-      imageFile: !!imageFile,
-      selectedFile: !!selectedFile 
-    });
-
     try {
       let finalContent = content;
 
@@ -191,7 +182,6 @@ export function AdminPanel({ user }: AdminPanelProps) {
 
       // Upload image if selected
       if (imageFile) {
-        console.log("Starting image upload", { fileName: imageFile.name, size: imageFile.size });
         // Create a safe filename by removing Hebrew and non-ASCII characters
         const fileExtension = imageFile.name.split('.').pop() || '';
         const timestamp = Date.now();
@@ -200,10 +190,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
           .from('lesson-images')
           .upload(fileName, imageFile);
 
-        console.log("Image upload result", { uploadData, uploadError });
-
         if (uploadError) {
-          console.error("Error uploading image:", uploadError);
           toast({
             title: "שגיאה",
             description: "לא ניתן להעלות את התמונה",
@@ -216,7 +203,6 @@ export function AdminPanel({ user }: AdminPanelProps) {
             .from('lesson-images')
             .getPublicUrl(fileName);
           uploadedImageUrl = publicUrl;
-          console.log("Image uploaded successfully", { publicUrl });
         }
       }
 
@@ -230,8 +216,6 @@ export function AdminPanel({ user }: AdminPanelProps) {
         related_lessons: relatedLessons
       };
 
-      console.log("Saving lesson data", lessonData);
-
       let lessonId: string;
 
       if (editingLesson) {
@@ -240,10 +224,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
           .update(lessonData)
           .eq("id", editingLesson.id);
         
-        console.log("Update lesson result", { error });
-        
         if (error) {
-          console.error("Error updating lesson:", error);
           throw error;
         }
 
@@ -266,10 +247,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
           .select()
           .single();
         
-        console.log("Insert lesson result", { lessonResult, error });
-        
         if (error) {
-          console.error("Error creating lesson:", error);
           throw error;
         }
 
@@ -310,12 +288,9 @@ export function AdminPanel({ user }: AdminPanelProps) {
       setImageUrl("");
       setEditingLesson(null);
       
-      console.log("Form cleared, refreshing lessons");
       // Refresh lessons
       fetchLessons();
-      console.log("Lessons refresh called");
     } catch (error) {
-      console.error("Error saving lesson:", error);
       toast({
         title: "שגיאה",
         description: "אירעה שגיאה בשמירת השיעור",
@@ -323,12 +298,10 @@ export function AdminPanel({ user }: AdminPanelProps) {
       });
     } finally {
       setIsLoading(false);
-      console.log("Form submission finished, loading:", false);
     }
   };
 
   const handleEdit = (lesson: Lesson) => {
-    console.log("Editing lesson:", lesson);
     setEditingLesson(lesson);
     setTitle(lesson.title);
     setSummary(lesson.summary);

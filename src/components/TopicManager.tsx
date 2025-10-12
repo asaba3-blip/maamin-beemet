@@ -45,41 +45,27 @@ export function TopicManager() {
   const checkAdminStatus = async () => {
     try {
       if (!user) {
-        console.log('TopicManager: No user found');
         setIsAdmin(false);
         setIsLoading(false);
         return;
       }
 
-      console.log('TopicManager: User found:', user.id, user.email);
-
-      // Check if user has a profile first
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('is_admin')
+      // Check if user has admin role in user_roles table
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
         .eq('user_id', user.id)
+        .eq('role', 'admin')
         .maybeSingle();
 
-      console.log('TopicManager: Profile query result:', { profile, profileError });
-
-      if (profileError) {
-        console.error('TopicManager: Profile error:', profileError);
+      if (roleError) {
         setIsAdmin(false);
         setIsLoading(false);
         return;
       }
 
-      if (!profile) {
-        console.log('TopicManager: No profile found for user');
-        setIsAdmin(false);
-        setIsLoading(false);
-        return;
-      }
-
-      console.log('TopicManager: User is admin:', profile.is_admin);
-      setIsAdmin(profile.is_admin === true);
+      setIsAdmin(!!roleData);
     } catch (error) {
-      console.error('TopicManager: Error checking admin status:', error);
       setIsAdmin(false);
     } finally {
       setIsLoading(false);
