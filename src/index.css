@@ -231,22 +231,24 @@
   font-weight: 400;
 }
 
-.hebrew-content a {
-  background: hsl(var(--primary));
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  border: 2px solid white;
-  text-decoration: none;
-  transition: all 0.2s;
-  display: inline-block;
-  margin: 0 0.125rem;
+.hebrew-content a,
+.content-typography a {
+  background: hsl(var(--primary)) !important;
+  color: white !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 0.25rem !important;
+  border: 2px solid white !important;
+  text-decoration: none !important;
+  transition: all 0.2s !important;
+  display: inline-block !important;
+  margin: 0 0.125rem !important;
 }
 
-.hebrew-content a:hover {
-  background: hsl(var(--primary-light));
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px hsl(var(--primary) / 0.3);
+.hebrew-content a:hover,
+.content-typography a:hover {
+  background: hsl(var(--primary-light)) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.3) !important;
 }
 
 /* Enhanced typography for better readability */
@@ -276,22 +278,4 @@
 
 .content-typography em {
   @apply italic;
-}
-
-.content-typography a {
-  background: hsl(var(--primary));
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  border: 2px solid white;
-  text-decoration: none;
-  transition: all 0.2s;
-  display: inline-block;
-  margin: 0 0.125rem;
-}
-
-.content-typography a:hover {
-  background: hsl(var(--primary-light));
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px hsl(var(--primary) / 0.3);
 }
