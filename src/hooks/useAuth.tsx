@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAdminStatus = async (userId: string) => {
     try {
-      // Check if user has admin role in user_roles table
+      // Check if user has admin role in user_roles table (security fix)
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
@@ -67,16 +67,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
 
       if (error) {
-        console.error('Error checking admin status:', error);
+        // Don't log sensitive errors to console
         if (error.code === 'PGRST116') {
           // Profile doesn't exist, create one
           await createProfile(userId);
         }
+        setIsAdmin(false);
       } else {
         setIsAdmin(!!data);
       }
     } catch (error) {
-      console.error('Error checking admin status:', error);
+      setIsAdmin(false);
     }
   };
 
@@ -107,12 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    if (error) {
-      console.error("שגיאה בהרשמה:", getErrorMessage(error.message));
-    } else {
-      console.log("נרשמת בהצלחה - אנא בדוק את האימייל שלך לאישור ההרשמה");
-    }
-
+    // Don't log sensitive auth details to console
     return { error };
   };
 
@@ -122,12 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
     });
 
-    if (error) {
-      console.error("שגיאה בהתחברות:", getErrorMessage(error.message));
-    } else {
-      console.log("התחברת בהצלחה - ברוך הבא לאתר");
-    }
-
+    // Don't log sensitive auth details to console
     return { error };
   };
 
@@ -139,17 +130,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    if (error) {
-      console.error("שגיאה בהתחברות עם גוגל:", getErrorMessage(error.message));
-    }
-
+    // Don't log sensitive auth details to console
     return { error };
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
     setIsAdmin(false);
-    console.log("התנתקת בהצלחה - להתראות!");
   };
 
   const getErrorMessage = (errorMessage: string) => {
