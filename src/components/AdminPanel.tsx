@@ -161,7 +161,14 @@ export function AdminPanel({ user }: AdminPanelProps) {
 
   const processWordFile = async (file: File): Promise<string> => {
     try {
-      const arrayBuffer = await file.arrayBuffer();
+      // Use FileReader for better compatibility
+      const arrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as ArrayBuffer);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsArrayBuffer(file);
+      });
+      
       // Extract HTML instead of raw text to preserve formatting
       const result = await mammoth.convertToHtml({ arrayBuffer });
       return result.value;
