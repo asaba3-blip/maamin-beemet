@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Save, Globe } from "lucide-react";
+import { siteSettingsSchema } from "@/lib/validation";
 
 interface SiteSetting {
   id: string;
@@ -85,6 +86,26 @@ export function SiteSettingsManager() {
     setIsLoading(true);
     
     try {
+      // Validate form data
+      const validationResult = siteSettingsSchema.safeParse({
+        site_title: siteTitle,
+        hero_title: heroTitle,
+        hero_subtitle: heroSubtitle,
+        admin_message: adminMessage,
+        admin_message_enabled: adminMessageEnabled
+      });
+
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.errors.map(err => err.message).join(', ');
+        toast({
+          title: "שגיאת תיקוף",
+          description: errorMessages,
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Update all settings
       await Promise.all([
         updateSetting('site_title', siteTitle),

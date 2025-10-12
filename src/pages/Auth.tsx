@@ -8,20 +8,25 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { BookOpen, Mail, Lock, LogIn, UserPlus } from "lucide-react";
+import { signUpSchema, signInSchema } from "@/lib/validation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Auth() {
   const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [loginErrors, setLoginErrors] = useState<{ email?: string; password?: string }>({});
 
   // Signup form state
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [signupErrors, setSignupErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
 
   // Redirect if already logged in
   useEffect(() => {
@@ -32,12 +37,36 @@ export default function Auth() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginErrors({});
+    
+    // Validate input
+    const validationResult = signInSchema.safeParse({
+      email: loginEmail,
+      password: loginPassword
+    });
+
+    if (!validationResult.success) {
+      const errors: { email?: string; password?: string } = {};
+      validationResult.error.errors.forEach((err) => {
+        if (err.path[0] === 'email') errors.email = err.message;
+        if (err.path[0] === 'password') errors.password = err.message;
+      });
+      setLoginErrors(errors);
+      return;
+    }
+
     setIsLoading(true);
 
     const { error } = await signIn(loginEmail, loginPassword);
     
     if (!error) {
       navigate("/");
+    } else {
+      toast({
+        title: "שגיאה בהתחברות",
+        description: error.message || "אימייל או סיסמה לא נכונים",
+        variant: "destructive",
+      });
     }
     
     setIsLoading(false);
@@ -45,8 +74,23 @@ export default function Auth() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSignupErrors({});
     
-    if (signupPassword !== confirmPassword) {
+    // Validate input
+    const validationResult = signUpSchema.safeParse({
+      email: signupEmail,
+      password: signupPassword,
+      confirmPassword: confirmPassword
+    });
+
+    if (!validationResult.success) {
+      const errors: { email?: string; password?: string; confirmPassword?: string } = {};
+      validationResult.error.errors.forEach((err) => {
+        if (err.path[0] === 'email') errors.email = err.message;
+        if (err.path[0] === 'password') errors.password = err.message;
+        if (err.path[0] === 'confirmPassword') errors.confirmPassword = err.message;
+      });
+      setSignupErrors(errors);
       return;
     }
 
@@ -55,10 +99,20 @@ export default function Auth() {
     const { error } = await signUp(signupEmail, signupPassword);
     
     if (!error) {
+      toast({
+        title: "הרשמה הצליחה",
+        description: "אנא בדוק את האימייל שלך לאישור החשבון",
+      });
       // Stay on this page to show success message
       setSignupEmail("");
       setSignupPassword("");
       setConfirmPassword("");
+    } else {
+      toast({
+        title: "שגיאה בהרשמה",
+        description: error.message || "אירעה שגיאה בהרשמה",
+        variant: "destructive",
+      });
     }
     
     setIsLoading(false);
@@ -127,7 +181,11 @@ export default function Auth() {
                       onChange={(e) => setLoginEmail(e.target.value)}
                       required
                       disabled={isLoading}
+                      className={loginErrors.email ? "border-destructive" : ""}
                     />
+                    {loginErrors.email && (
+                      <p className="text-sm text-destructive mt-1">{loginErrors.email}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="login-password" className="flex items-center gap-2">
@@ -142,7 +200,11 @@ export default function Auth() {
                       onChange={(e) => setLoginPassword(e.target.value)}
                       required
                       disabled={isLoading}
+                      className={loginErrors.password ? "border-destructive" : ""}
                     />
+                    {loginErrors.password && (
+                      <p className="text-sm text-destructive mt-1">{loginErrors.password}</p>
+                    )}
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "מתחבר..." : "התחבר"}
@@ -165,7 +227,11 @@ export default function Auth() {
                       onChange={(e) => setSignupEmail(e.target.value)}
                       required
                       disabled={isLoading}
+                      className={signupErrors.email ? "border-destructive" : ""}
                     />
+                    {signupErrors.email && (
+                      <p className="text-sm text-destructive mt-1">{signupErrors.email}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password" className="flex items-center gap-2">
@@ -175,13 +241,16 @@ export default function Auth() {
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder="בחר סיסמה חזקה"
+                      placeholder="בחר סיסמה חזקה (8+ תווים, אותיות גדולות/קטנות באנגלית, ספרה)"
                       value={signupPassword}
                       onChange={(e) => setSignupPassword(e.target.value)}
                       required
                       disabled={isLoading}
-                      minLength={6}
+                      className={signupErrors.password ? "border-destructive" : ""}
                     />
+                    {signupErrors.password && (
+                      <p className="text-sm text-destructive mt-1">{signupErrors.password}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="confirm-password" className="flex items-center gap-2">
@@ -196,16 +265,16 @@ export default function Auth() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       disabled={isLoading}
-                      minLength={6}
+                      className={signupErrors.confirmPassword ? "border-destructive" : ""}
                     />
-                    {signupPassword !== confirmPassword && confirmPassword && (
-                      <p className="text-sm text-destructive">הסיסמאות אינן תואמות</p>
+                    {signupErrors.confirmPassword && (
+                      <p className="text-sm text-destructive mt-1">{signupErrors.confirmPassword}</p>
                     )}
                   </div>
                   <Button 
                     type="submit" 
                     className="w-full" 
-                    disabled={isLoading || signupPassword !== confirmPassword}
+                    disabled={isLoading}
                   >
                     {isLoading ? "נרשם..." : "הירשם"}
                   </Button>

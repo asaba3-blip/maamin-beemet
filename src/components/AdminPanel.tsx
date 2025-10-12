@@ -15,6 +15,7 @@ import ReactQuill from "react-quill";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TopicManager } from "./TopicManager";
 import { SiteSettingsManager } from "./SiteSettingsManager";
+import { lessonSchema, validateImageFile, validateDocumentFile } from "@/lib/validation";
 
 interface Topic {
   id: string;
@@ -108,7 +109,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.type.includes("document") || file.name.endsWith(".docx") || file.name.endsWith(".doc")) {
+      const validation = validateDocumentFile(file);
+      if (validation.valid) {
         setSelectedFile(file);
         toast({
           title: "קובץ נבחר",
@@ -117,7 +119,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
       } else {
         toast({
           title: "שגיאה",
-          description: "אנא בחר קובץ Word (.doc או .docx)",
+          description: validation.error,
           variant: "destructive",
         });
       }
@@ -127,7 +129,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.type.startsWith("image/")) {
+      const validation = validateImageFile(file);
+      if (validation.valid) {
         setImageFile(file);
         setImageUrl(URL.createObjectURL(file));
         toast({
@@ -137,7 +140,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
       } else {
         toast({
           title: "שגיאה",
-          description: "אנא בחר קובץ תמונה",
+          description: validation.error,
           variant: "destructive",
         });
       }
@@ -176,6 +179,28 @@ export function AdminPanel({ user }: AdminPanelProps) {
           title: "קובץ Word עובד",
           description: "התוכן הועתק מקובץ ה-Word אוטומטית",
         });
+      }
+
+      // Validate form data before submission
+      const validationResult = lessonSchema.safeParse({
+        title,
+        summary,
+        content: finalContent,
+        topic_ids: selectedTopics,
+        related_lessons: relatedLessons,
+        image_url: imageUrl || '',
+        published
+      });
+
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.errors.map(err => err.message).join(', ');
+        toast({
+          title: "שגיאת תיקוף",
+          description: errorMessages,
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
       }
 
       let uploadedImageUrl = imageUrl;
