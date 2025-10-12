@@ -290,3 +290,15 @@
 .content-typography em {
   @apply italic;
 }
+
+/* Images in lesson content preserve aspect ratio */
+.hebrew-content img,
+.content-typography img {
+  max-width: 100%;
+  height: auto !important;
+  width: auto !important;
+  object-fit: contain;
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 0.5rem;
+}

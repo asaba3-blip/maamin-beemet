@@ -12,8 +12,7 @@ export const lessonSchema = z.object({
     .max(500, { message: "תקציר השיעור חייב להיות עד 500 תווים" }),
   content: z.string()
     .trim()
-    .min(1, { message: "תוכן השיעור נדרש" })
-    .max(50000, { message: "תוכן השיעור חייב להיות עד 50,000 תווים" }),
+    .min(1, { message: "תוכן השיעור נדרש" }),
   topic_ids: z.array(z.string().uuid({ message: "מזהה נושא לא תקין" }))
     .min(1, { message: "יש לבחור לפחות נושא אחד" })
     .max(10, { message: "ניתן לבחור עד 10 נושאים" }),
