@@ -302,3 +302,21 @@
   margin: 1.5rem auto;
   border-radius: 0.5rem;
 }
+
+/* Links in lesson content */
+.hebrew-content a,
+.content-typography a {
+  @apply text-primary underline decoration-2 underline-offset-4 transition-colors;
+}
+
+.hebrew-content a:hover,
+.content-typography a:hover {
+  @apply text-primary/80;
+}
+
+/* External links indicator */
+.hebrew-content a[href^="http"]:not([href*="localhost"]):not([href*="127.0.0.1"]):after,
+.content-typography a[href^="http"]:not([href*="localhost"]):not([href*="127.0.0.1"]):after {
+  content: " ↗";
+  @apply text-muted-foreground text-sm;
+}

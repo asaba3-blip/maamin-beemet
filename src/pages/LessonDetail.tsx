@@ -284,7 +284,9 @@ export default function LessonDetail() {
                 dangerouslySetInnerHTML={{ 
                   __html: DOMPurify.sanitize(lesson.content, {
                     ALLOWED_TAGS: ['p', 'br', 'b', 'i', 'u', 'strong', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'blockquote', 'code', 'pre', 'span', 'div'],
-                    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style']
+                    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style', 'target', 'rel'],
+                    ADD_ATTR: ['target', 'rel'],
+                    ALLOW_UNKNOWN_PROTOCOLS: false
                   })
                 }}
               />
