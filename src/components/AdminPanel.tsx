@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { User } from "@supabase/supabase-js";
-import { Upload, FileText, Edit, Trash2, Eye, Image, Settings, BookOpen, Globe } from "lucide-react";
+import { Upload, FileText, Edit, Trash2, Eye, Image, Settings, BookOpen, Globe, Copy, ExternalLink } from "lucide-react";
 import mammoth from "mammoth";
 import ReactQuill from "react-quill";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -655,7 +655,39 @@ export function AdminPanel({ user }: AdminPanelProps) {
                 className="flex items-center justify-between p-4 border rounded-lg"
               >
                 <div className="flex-1">
-                  <h3 className="font-semibold">{lesson.title}</h3>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="font-semibold">{lesson.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => {
+                          const lessonUrl = `/lesson/${lesson.id}`;
+                          navigator.clipboard.writeText(lessonUrl);
+                          toast({
+                            title: "הועתק",
+                            description: "הלינק הועתק ללוח",
+                          });
+                        }}
+                      >
+                        <Copy className="h-3 w-3 ml-1" />
+                        העתק לינק
+                      </Button>
+                      <a
+                        href={`/lesson/${lesson.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        צפייה
+                      </a>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground font-mono bg-muted px-2 py-1 rounded inline-block mb-2">
+                    ID: {lesson.id}
+                  </p>
                   <p className="text-sm text-muted-foreground">
                     {lesson.lesson_topics && lesson.lesson_topics.length > 0 
                       ? lesson.lesson_topics.map(lt => lt.topics.name).join(", ")
