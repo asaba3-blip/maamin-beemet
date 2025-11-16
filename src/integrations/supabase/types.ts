@@ -274,7 +274,7 @@ export type Database = {
     }
     Functions: {
       get_public_profiles: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avatar_url: string
           created_at: string
