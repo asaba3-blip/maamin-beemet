@@ -70,6 +70,35 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_views: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_id: string
+          visitor_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_id: string
+          visitor_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          visitor_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_views_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lessons: {
         Row: {
           comments_count: number
@@ -290,6 +319,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_lesson_views: {
+        Args: { p_lesson_id: string }
+        Returns: undefined
       }
     }
     Enums: {

@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Heart, MessageCircle, Calendar, Clock, Share2 } from "lucide-react";
+import { ArrowRight, Heart, MessageCircle, Calendar, Clock, Share2, Eye } from "lucide-react";
+import { trackLessonView, formatViewCount } from "@/lib/viewTracker";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +23,7 @@ interface Lesson {
   };
   likes_count: number;
   comments_count: number;
+  views_count: number;
   isLiked?: boolean;
 }
 
@@ -39,12 +41,26 @@ export default function LessonDetail() {
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [relatedLessons, setRelatedLessons] = useState<RelatedLesson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const viewTrackedRef = useRef(false);
 
   useEffect(() => {
     if (id) {
       fetchLesson();
     }
   }, [id, user]);
+
+  // Track view once per session
+  useEffect(() => {
+    if (id && lesson && !viewTrackedRef.current) {
+      viewTrackedRef.current = true;
+      trackLessonView(id).then((counted) => {
+        if (counted) {
+          // Increment the local view count
+          setLesson(prev => prev ? { ...prev, views_count: prev.views_count + 1 } : null);
+        }
+      });
+    }
+  }, [id, lesson]);
 
   const fetchLesson = async () => {
     try {
@@ -232,6 +248,10 @@ export default function LessonDetail() {
             )}
             
             <div className="flex items-center justify-end gap-6 text-muted-foreground mb-4">
+              <div className="flex items-center gap-1">
+                <span>{formatViewCount(lesson.views_count)}</span>
+                <Eye className="h-4 w-4" />
+              </div>
               <div className="flex items-center gap-1">
                 <span>10 דק'</span>
                 <Clock className="h-4 w-4" />
