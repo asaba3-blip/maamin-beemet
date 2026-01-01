@@ -209,11 +209,11 @@ export default function LessonDetail() {
 
         <article className="max-w-4xl mx-auto">
           {lesson.image_url && (
-            <div className="relative mb-8 rounded-lg overflow-hidden">
+            <div className="relative mb-8 rounded-lg overflow-hidden bg-muted">
               <img 
                 src={lesson.image_url} 
                 alt={lesson.title}
-                className="w-full h-64 md:h-96 object-cover"
+                className="w-full h-64 md:h-96 object-contain"
               />
               <div className="absolute top-4 right-4">
                 <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm">

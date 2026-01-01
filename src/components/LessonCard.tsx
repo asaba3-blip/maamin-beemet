@@ -30,12 +30,12 @@ interface LessonCardProps {
 export function LessonCard({ lesson, onLike, onReadMore }: LessonCardProps) {
   return (
     <Card className="group hover:shadow-card transition-all duration-300 overflow-hidden">
-      <div className="relative">
+      <div className="relative bg-muted">
         {(lesson.image || lesson.image_url) && (
           <img 
             src={lesson.image || lesson.image_url} 
             alt={lesson.title}
-            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-48 object-contain group-hover:scale-105 transition-transform duration-300"
           />
         )}
         <div className="absolute top-3 right-3">
