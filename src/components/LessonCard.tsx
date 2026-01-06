@@ -1,7 +1,14 @@
-import { Heart, MessageCircle, Calendar, Clock } from "lucide-react";
+import { Heart, MessageCircle, Calendar, Clock, Eye } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+
+const formatViewCount = (count: number): string => {
+  if (count >= 1000) {
+    return (count / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  }
+  return count.toString();
+};
 
 interface Lesson {
   id: string;
@@ -18,6 +25,7 @@ interface Lesson {
   likes_count?: number;
   comments?: number;
   comments_count?: number;
+  views_count?: number;
   isLiked?: boolean;
 }
 
@@ -73,7 +81,7 @@ export function LessonCard({ lesson, onLike, onReadMore }: LessonCardProps) {
             variant="ghost" 
             size="sm"
             onClick={() => onLike(lesson.id)}
-            className={`gap-1 ${lesson.isLiked ? 'text-red-500' : 'text-muted-foreground'}`}
+            className={`gap-1 hover:text-red-500 ${lesson.isLiked ? 'text-red-500' : 'text-muted-foreground'}`}
           >
             <span>{lesson.likes || lesson.likes_count || 0}</span>
             <Heart className={`h-4 w-4 ${lesson.isLiked ? 'fill-current' : ''}`} />
@@ -82,6 +90,11 @@ export function LessonCard({ lesson, onLike, onReadMore }: LessonCardProps) {
           <div className="flex items-center gap-1 text-muted-foreground">
             <span>{lesson.comments || lesson.comments_count || 0}</span>
             <MessageCircle className="h-4 w-4" />
+          </div>
+          
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <span>{formatViewCount(lesson.views_count || 0)}</span>
+            <Eye className="h-4 w-4" />
           </div>
         </div>
         
