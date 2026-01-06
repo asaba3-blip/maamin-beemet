@@ -51,6 +51,34 @@ export function LessonCard({ lesson, onLike, onReadMore }: LessonCardProps) {
             {lesson.topic || lesson.topics?.name}
           </Badge>
         </div>
+        
+        {/* Stats overlay at bottom of image */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+          <div className="flex items-center justify-start gap-4 text-white text-sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onLike(lesson.id);
+              }}
+              className={`gap-1 p-1 h-auto hover:bg-white/20 ${lesson.isLiked ? 'text-red-400' : 'text-white'}`}
+            >
+              <Heart className={`h-4 w-4 ${lesson.isLiked ? 'fill-current' : ''}`} />
+              <span>{lesson.likes || lesson.likes_count || 0}</span>
+            </Button>
+            
+            <div className="flex items-center gap-1">
+              <MessageCircle className="h-4 w-4" />
+              <span>{lesson.comments || lesson.comments_count || 0}</span>
+            </div>
+            
+            <div className="flex items-center gap-1">
+              <Eye className="h-4 w-4" />
+              <span>{formatViewCount(lesson.views_count || 0)}</span>
+            </div>
+          </div>
+        </div>
       </div>
       
       <CardHeader className="text-right">
@@ -75,32 +103,10 @@ export function LessonCard({ lesson, onLike, onReadMore }: LessonCardProps) {
         <p className="text-muted-foreground leading-relaxed font-body">{lesson.summary}</p>
       </CardContent>
       
-      <CardFooter className="flex justify-between items-center pt-4 border-t">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => onLike(lesson.id)}
-            className={`gap-1 hover:text-red-500 ${lesson.isLiked ? 'text-red-500' : 'text-muted-foreground'}`}
-          >
-            <span>{lesson.likes || lesson.likes_count || 0}</span>
-            <Heart className={`h-4 w-4 ${lesson.isLiked ? 'fill-current' : ''}`} />
-          </Button>
-          
-          <div className="flex items-center gap-1 text-muted-foreground">
-            <span>{lesson.comments || lesson.comments_count || 0}</span>
-            <MessageCircle className="h-4 w-4" />
-          </div>
-          
-          <div className="flex items-center gap-1 text-muted-foreground">
-            <span>{formatViewCount(lesson.views_count || 0)}</span>
-            <Eye className="h-4 w-4" />
-          </div>
-        </div>
-        
+      <CardFooter className="pt-4 border-t">
         <Button 
           onClick={() => onReadMore(lesson.id)}
-          className="font-medium"
+          className="font-medium w-full"
         >
           קרא עוד
         </Button>
