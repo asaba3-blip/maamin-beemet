@@ -4,31 +4,20 @@
     
     <!-- Homepage -->
     <url>
-        <loc>https://yourdomain.com/</loc>
-        <lastmod>2024-01-01</lastmod>
+        <loc>https://maamin-beemet.lovable.app/</loc>
+        <lastmod>2025-01-09</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
-        <xhtml:link rel="alternate" hreflang="he" href="https://yourdomain.com/" />
+        <xhtml:link rel="alternate" hreflang="he" href="https://maamin-beemet.lovable.app/" />
     </url>
     
     <!-- Auth page -->
     <url>
-        <loc>https://yourdomain.com/auth</loc>
-        <lastmod>2024-01-01</lastmod>
+        <loc>https://maamin-beemet.lovable.app/auth</loc>
+        <lastmod>2025-01-09</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-        <xhtml:link rel="alternate" hreflang="he" href="https://yourdomain.com/auth" />
+        <priority>0.5</priority>
+        <xhtml:link rel="alternate" hreflang="he" href="https://maamin-beemet.lovable.app/auth" />
     </url>
-    
-    <!-- Add lesson URLs dynamically when you have specific lesson URLs -->
-    <!-- Example:
-    <url>
-        <loc>https://yourdomain.com/lesson/lesson-id</loc>
-        <lastmod>2024-01-01</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.9</priority>
-        <xhtml:link rel="alternate" hreflang="he" href="https://yourdomain.com/lesson/lesson-id" />
-    </url>
-    -->
     
 </urlset>
