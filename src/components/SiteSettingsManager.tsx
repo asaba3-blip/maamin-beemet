@@ -23,6 +23,8 @@ export function SiteSettingsManager() {
   const [siteTitle, setSiteTitle] = useState("");
   const [heroTitle, setHeroTitle] = useState("");
   const [heroSubtitle, setHeroSubtitle] = useState("");
+  const [headerTitle, setHeaderTitle] = useState("");
+  const [headerSubtitle, setHeaderSubtitle] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
   const [adminMessageEnabled, setAdminMessageEnabled] = useState(false);
   const { toast } = useToast();
@@ -52,6 +54,12 @@ export function SiteSettingsManager() {
             break;
           case 'hero_subtitle':
             setHeroSubtitle(setting.setting_value || '');
+            break;
+          case 'header_title':
+            setHeaderTitle(setting.setting_value || '');
+            break;
+          case 'header_subtitle':
+            setHeaderSubtitle(setting.setting_value || '');
             break;
           case 'admin_message':
             setAdminMessage(setting.setting_value || '');
@@ -111,6 +119,8 @@ export function SiteSettingsManager() {
         updateSetting('site_title', siteTitle),
         updateSetting('hero_title', heroTitle),
         updateSetting('hero_subtitle', heroSubtitle),
+        updateSetting('header_title', headerTitle),
+        updateSetting('header_subtitle', headerSubtitle),
         updateSetting('admin_message', adminMessage),
         updateSetting('admin_message_enabled', adminMessageEnabled.toString()),
       ]);
@@ -189,6 +199,45 @@ export function SiteSettingsManager() {
             <p className="text-sm text-muted-foreground mt-1">
               התיאור שמופיע מתחת לכותרת הראשית
             </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>כותרות Header (חלק עליון)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="headerTitle">כותרת ראשית ב-Header</Label>
+              <Input
+                id="headerTitle"
+                value={headerTitle}
+                onChange={(e) => setHeaderTitle(e.target.value)}
+                placeholder="לימודי מקרא ויהדות"
+                className="text-right"
+                dir="rtl"
+              />
+              <p className="text-sm text-muted-foreground mt-1">
+                הכותרת שמוצגת ליד הלוגו בחלק העליון
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="headerSubtitle">תת כותרת ב-Header</Label>
+              <Input
+                id="headerSubtitle"
+                value={headerSubtitle}
+                onChange={(e) => setHeaderSubtitle(e.target.value)}
+                placeholder="מקור לחכמה ותורה"
+                className="text-right"
+                dir="rtl"
+              />
+              <p className="text-sm text-muted-foreground mt-1">
+                התיאור הקצר שמופיע מתחת לכותרת
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
