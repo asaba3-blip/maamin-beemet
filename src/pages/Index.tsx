@@ -239,6 +239,8 @@ const Index = () => {
           const { signOut } = useAuth();
           await signOut();
         }}
+        headerTitle={siteSettings.header_title || "לימודי מקרא ויהדות"}
+        headerSubtitle={siteSettings.header_subtitle || "מקור לחכמה ותורה"}
       />
       
       <HeroSection 

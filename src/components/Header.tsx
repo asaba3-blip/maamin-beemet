@@ -18,6 +18,8 @@ interface HeaderProps {
   isAdmin?: boolean;
   onAdminToggle?: () => void;
   onSignOut?: () => Promise<void>;
+  headerTitle?: string;
+  headerSubtitle?: string;
 }
 
 export function Header({ 
@@ -26,7 +28,9 @@ export function Header({
   user, 
   isAdmin, 
   onAdminToggle, 
-  onSignOut 
+  onSignOut,
+  headerTitle = "לימודי מקרא ויהדות",
+  headerSubtitle = "מקור לחכמה ותורה"
 }: HeaderProps) {
   return (
     <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
@@ -38,8 +42,8 @@ export function Header({
               <BookOpen className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-primary">לימודי מקרא ויהדות</h1>
-              <p className="text-sm text-muted-foreground">מקור לחכמה ותורה</p>
+              <h1 className="text-xl font-bold text-primary">{headerTitle}</h1>
+              <p className="text-sm text-muted-foreground">{headerSubtitle}</p>
             </div>
           </div>
 
