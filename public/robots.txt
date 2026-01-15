@@ -9,7 +9,7 @@ Allow: /auth
 Disallow: /admin
 
 # Sitemap location (dynamic sitemap with all lessons)
-Sitemap: https://sfqbhpplirspvgdqlcdl.supabase.co/functions/v1/generate-sitemap
+Sitemap: https://maamin-beemet.lovable.app/sitemap.xml
 
 # Crawl delay (optional - helps with server load)
 Crawl-delay: 1
