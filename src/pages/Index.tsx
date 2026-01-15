@@ -232,6 +232,7 @@ const Index = () => {
       <Header 
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        lessons={displayLessons}
         user={user}
         isAdmin={isAdmin}
         onAdminToggle={() => setShowAdmin(!showAdmin)}

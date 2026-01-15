@@ -1,8 +1,8 @@
-import { Search, BookOpen, User, Settings, LogOut } from "lucide-react";
+import { BookOpen, User, Settings, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import { User as UserType } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { SearchDropdown } from "@/components/SearchDropdown";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -11,9 +11,17 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 
+interface Lesson {
+  id: string;
+  title: string;
+  summary: string;
+  content?: string;
+}
+
 interface HeaderProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  lessons?: Lesson[];
   user?: UserType | null;
   isAdmin?: boolean;
   onAdminToggle?: () => void;
@@ -25,6 +33,7 @@ interface HeaderProps {
 export function Header({ 
   searchQuery, 
   onSearchChange, 
+  lessons = [],
   user, 
   isAdmin, 
   onAdminToggle, 
@@ -48,19 +57,11 @@ export function Header({
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="חיפוש שיעורים..."
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                className="pr-10 text-right"
-                dir="rtl"
-              />
-            </div>
-          </div>
+          <SearchDropdown
+            searchQuery={searchQuery}
+            onSearchChange={onSearchChange}
+            lessons={lessons}
+          />
 
           {/* Navigation */}
           <nav className="flex items-center gap-2">
