@@ -1,0 +1,2 @@
+# Redirect sitemap.xml to dynamic Supabase Edge Function
+/sitemap.xml https://sfqbhpplirspvgdqlcdl.supabase.co/functions/v1/generate-sitemap 200
