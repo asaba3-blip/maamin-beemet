@@ -9,8 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import DOMPurify from 'dompurify';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 
 interface Lesson {
   id: string;
@@ -53,13 +51,11 @@ export default function LessonDetail() {
     }
   }, [id, user]);
 
-  // Track view once per session
   useEffect(() => {
     if (id && lesson && !viewTrackedRef.current) {
       viewTrackedRef.current = true;
       trackLessonView(id).then((counted) => {
         if (counted) {
-          // Increment the local view count
           setLesson(prev => prev ? { ...prev, views_count: prev.views_count + 1 } : null);
         }
       });
@@ -100,7 +96,6 @@ export default function LessonDetail() {
         isLiked
       });
 
-      // Fetch related lessons if they exist
       if (lessonData.related_lessons && lessonData.related_lessons.length > 0) {
         const { data: relatedData } = await supabase
           .from("lessons")
@@ -173,13 +168,23 @@ export default function LessonDetail() {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('he-IL');
+  };
+
   const handleDownloadPdf = async () => {
     if (!lesson || !contentRef.current) return;
     
     setIsGeneratingPdf(true);
     
     try {
-      // Create a temporary container for PDF generation
+      // Dynamic imports to avoid build-time type resolution issues
+      const [{ jsPDF }, html2canvasModule] = await Promise.all([
+        import('jspdf'),
+        import('html2canvas')
+      ]);
+      const html2canvas = html2canvasModule.default;
+      
       const pdfContent = document.createElement('div');
       pdfContent.style.direction = 'rtl';
       pdfContent.style.fontFamily = 'Arial, sans-serif';
@@ -190,18 +195,22 @@ export default function LessonDetail() {
       pdfContent.style.position = 'absolute';
       pdfContent.style.left = '-9999px';
       
+      const sanitizedTitle = DOMPurify.sanitize(lesson.title);
+      const sanitizedTopic = DOMPurify.sanitize(lesson.topic.name);
+      const sanitizedSummary = DOMPurify.sanitize(lesson.summary);
+      const sanitizedContent = DOMPurify.sanitize(lesson.content);
+      
       pdfContent.innerHTML = `
-        <h1 style="font-size: 24px; margin-bottom: 10px; text-align: right;">${DOMPurify.sanitize(lesson.title)}</h1>
-        <p style="color: #666; margin-bottom: 5px; text-align: right;">${DOMPurify.sanitize(lesson.topic.name)}</p>
+        <h1 style="font-size: 24px; margin-bottom: 10px; text-align: right;">${sanitizedTitle}</h1>
+        <p style="color: #666; margin-bottom: 5px; text-align: right;">${sanitizedTopic}</p>
         <p style="color: #666; margin-bottom: 20px; text-align: right;">${formatDate(lesson.created_at)}</p>
-        <p style="font-size: 16px; color: #444; margin-bottom: 20px; text-align: right;">${DOMPurify.sanitize(lesson.summary)}</p>
+        <p style="font-size: 16px; color: #444; margin-bottom: 20px; text-align: right;">${sanitizedSummary}</p>
         <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
-        <div style="text-align: right; line-height: 1.8;">${DOMPurify.sanitize(lesson.content)}</div>
+        <div style="text-align: right; line-height: 1.8;">${sanitizedContent}</div>
       `;
       
       document.body.appendChild(pdfContent);
       
-      // Use html2canvas to render the content
       const canvas = await html2canvas(pdfContent, {
         scale: 2,
         useCORS: true,
@@ -228,11 +237,9 @@ export default function LessonDetail() {
       const scaledWidth = imgWidth * ratio;
       const scaledHeight = imgHeight * ratio;
       
-      // Handle multi-page content
       const pageHeight = pdfHeight - 20;
       let heightLeft = scaledHeight;
       let position = imgY;
-      let page = 1;
       
       pdf.addImage(imgData, 'JPEG', imgX, position, scaledWidth, scaledHeight);
       heightLeft -= pageHeight;
@@ -242,7 +249,6 @@ export default function LessonDetail() {
         pdf.addPage();
         pdf.addImage(imgData, 'JPEG', imgX, position, scaledWidth, scaledHeight);
         heightLeft -= pageHeight;
-        page++;
       }
       
       pdf.save(`${lesson.title}.pdf`);
@@ -261,10 +267,6 @@ export default function LessonDetail() {
     } finally {
       setIsGeneratingPdf(false);
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('he-IL');
   };
 
   if (isLoading) {
