@@ -320,3 +320,137 @@
   content: " ↗";
   @apply text-muted-foreground text-sm;
 }
+
+/* Print styles - optimized for lesson printing */
+@media print {
+  /* Hide navigation and interactive elements */
+  header,
+  nav,
+  footer,
+  .no-print,
+  button,
+  [role="button"],
+  .fixed,
+  .sticky {
+    display: none !important;
+  }
+
+  /* Reset background and colors for printing */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Full width content */
+  .container,
+  .max-w-4xl,
+  article {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Card styles for print */
+  .card,
+  [class*="Card"] {
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+  }
+
+  /* Typography adjustments for print */
+  h1 {
+    font-size: 24pt !important;
+    margin-bottom: 12pt !important;
+    color: black !important;
+  }
+
+  h2 {
+    font-size: 18pt !important;
+    margin-bottom: 10pt !important;
+    color: black !important;
+  }
+
+  h3 {
+    font-size: 14pt !important;
+    margin-bottom: 8pt !important;
+    color: black !important;
+  }
+
+  p {
+    font-size: 12pt !important;
+    margin-bottom: 8pt !important;
+    color: black !important;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Hebrew content print styles */
+  .hebrew-content,
+  .content-typography {
+    direction: rtl !important;
+    text-align: right !important;
+    color: black !important;
+  }
+
+  .hebrew-content p,
+  .content-typography p {
+    line-height: 1.8 !important;
+  }
+
+  /* Links in print - show URL */
+  .hebrew-content a,
+  .content-typography a {
+    color: black !important;
+    text-decoration: underline !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline !important;
+  }
+
+  .hebrew-content a:after,
+  .content-typography a:after {
+    content: " (" attr(href) ")" !important;
+    font-size: 9pt !important;
+    color: #666 !important;
+  }
+
+  /* Images in print */
+  .hebrew-content img,
+  .content-typography img {
+    max-width: 80% !important;
+    page-break-inside: avoid;
+  }
+
+  /* Badge styles for print */
+  .badge,
+  [class*="Badge"] {
+    background: #f0f0f0 !important;
+    color: black !important;
+    border: 1px solid #ccc !important;
+  }
+
+  /* Avoid page breaks in important areas */
+  article,
+  .card,
+  blockquote {
+    page-break-inside: avoid;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+
+  /* First page margin */
+  @page :first {
+    margin-top: 3cm;
+  }
+}
