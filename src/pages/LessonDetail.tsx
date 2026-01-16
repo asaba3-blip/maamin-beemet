@@ -204,12 +204,23 @@ export default function LessonDetail() {
       const sanitizedContent = DOMPurify.sanitize(lesson.content);
       
       pdfContent.innerHTML = `
-        <h1 style="font-size: 28px; margin-bottom: 12px; text-align: right; font-weight: bold;">${sanitizedTitle}</h1>
-        <p style="color: #555; margin-bottom: 6px; text-align: right; font-size: 14px;">${sanitizedTopic}</p>
-        <p style="color: #777; margin-bottom: 24px; text-align: right; font-size: 13px;">${formatDate(lesson.created_at)}</p>
-        <p style="font-size: 16px; color: #333; margin-bottom: 24px; text-align: right; line-height: 1.6;">${sanitizedSummary}</p>
-        <hr style="margin: 24px 0; border: none; border-top: 1px solid #ddd;" />
-        <div style="text-align: right; line-height: 1.9; font-size: 15px;">${sanitizedContent}</div>
+        <div style="border-bottom: 4px solid #1a365d; padding-bottom: 20px; margin-bottom: 24px;">
+          <h1 style="font-size: 32px; margin-bottom: 12px; text-align: right; font-weight: bold; color: #1a365d;">${sanitizedTitle}</h1>
+          <div style="display: flex; justify-content: flex-end; gap: 20px; align-items: center;">
+            <span style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 6px 16px; border-radius: 20px; font-size: 13px;">${sanitizedTopic}</span>
+            <span style="color: #64748b; font-size: 13px;">${formatDate(lesson.created_at)}</span>
+          </div>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border-right: 4px solid #0ea5e9; padding: 20px; margin-bottom: 28px; border-radius: 8px;">
+          <p style="font-size: 17px; color: #0c4a6e; text-align: right; line-height: 1.7; margin: 0; font-style: italic;">${sanitizedSummary}</p>
+        </div>
+        
+        <div style="text-align: right; line-height: 2; font-size: 16px; color: #1e293b;">${sanitizedContent}</div>
+        
+        <div style="border-top: 2px solid #e2e8f0; margin-top: 40px; padding-top: 16px; text-align: center;">
+          <p style="color: #94a3b8; font-size: 12px; margin: 0;">מאמין באמת • maamin-beemet.lovable.app</p>
+        </div>
       `;
       
       document.body.appendChild(pdfContent);
