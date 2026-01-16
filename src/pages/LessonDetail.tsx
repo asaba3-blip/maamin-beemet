@@ -206,10 +206,7 @@ export default function LessonDetail() {
       pdfContent.innerHTML = `
         <div style="border-bottom: 4px solid #1a365d; padding-bottom: 20px; margin-bottom: 24px;">
           <h1 style="font-size: 32px; margin-bottom: 12px; text-align: right; font-weight: bold; color: #1a365d;">${sanitizedTitle}</h1>
-          <div style="display: flex; justify-content: flex-end; gap: 20px; align-items: center;">
-            <span style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 6px 16px; border-radius: 20px; font-size: 13px;">${sanitizedTopic}</span>
-            <span style="color: #64748b; font-size: 13px;">${formatDate(lesson.created_at)}</span>
-          </div>
+          <p style="color: #64748b; font-size: 13px; text-align: right; margin: 0;">${formatDate(lesson.created_at)}</p>
         </div>
         
         <div style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border-right: 4px solid #0ea5e9; padding: 20px; margin-bottom: 28px; border-radius: 8px;">
