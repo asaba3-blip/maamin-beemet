@@ -185,13 +185,16 @@ export default function LessonDetail() {
       ]);
       const html2canvas = html2canvasModule.default;
       
+      // A4 dimensions at 96 DPI: 794px x 1123px, use slightly smaller for margins
+      const a4WidthPx = 750;
+      
       const pdfContent = document.createElement('div');
       pdfContent.style.direction = 'rtl';
       pdfContent.style.fontFamily = 'Arial, sans-serif';
-      pdfContent.style.padding = '20px';
+      pdfContent.style.padding = '40px';
       pdfContent.style.backgroundColor = 'white';
       pdfContent.style.color = 'black';
-      pdfContent.style.width = '800px';
+      pdfContent.style.width = `${a4WidthPx}px`;
       pdfContent.style.position = 'absolute';
       pdfContent.style.left = '-9999px';
       
@@ -201,12 +204,12 @@ export default function LessonDetail() {
       const sanitizedContent = DOMPurify.sanitize(lesson.content);
       
       pdfContent.innerHTML = `
-        <h1 style="font-size: 24px; margin-bottom: 10px; text-align: right;">${sanitizedTitle}</h1>
-        <p style="color: #666; margin-bottom: 5px; text-align: right;">${sanitizedTopic}</p>
-        <p style="color: #666; margin-bottom: 20px; text-align: right;">${formatDate(lesson.created_at)}</p>
-        <p style="font-size: 16px; color: #444; margin-bottom: 20px; text-align: right;">${sanitizedSummary}</p>
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
-        <div style="text-align: right; line-height: 1.8;">${sanitizedContent}</div>
+        <h1 style="font-size: 28px; margin-bottom: 12px; text-align: right; font-weight: bold;">${sanitizedTitle}</h1>
+        <p style="color: #555; margin-bottom: 6px; text-align: right; font-size: 14px;">${sanitizedTopic}</p>
+        <p style="color: #777; margin-bottom: 24px; text-align: right; font-size: 13px;">${formatDate(lesson.created_at)}</p>
+        <p style="font-size: 16px; color: #333; margin-bottom: 24px; text-align: right; line-height: 1.6;">${sanitizedSummary}</p>
+        <hr style="margin: 24px 0; border: none; border-top: 1px solid #ddd;" />
+        <div style="text-align: right; line-height: 1.9; font-size: 15px;">${sanitizedContent}</div>
       `;
       
       document.body.appendChild(pdfContent);
@@ -229,25 +232,27 @@ export default function LessonDetail() {
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const usableWidth = pdfWidth - (margin * 2);
+      
+      // Scale to fill the full usable width
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
-      const ratio = Math.min((pdfWidth - 20) / imgWidth, (pdfHeight - 20) / imgHeight);
-      const imgX = 10;
-      const imgY = 10;
-      const scaledWidth = imgWidth * ratio;
+      const ratio = usableWidth / imgWidth;
+      const scaledWidth = usableWidth;
       const scaledHeight = imgHeight * ratio;
       
-      const pageHeight = pdfHeight - 20;
+      const pageHeight = pdfHeight - (margin * 2);
       let heightLeft = scaledHeight;
-      let position = imgY;
+      let position = margin;
       
-      pdf.addImage(imgData, 'JPEG', imgX, position, scaledWidth, scaledHeight);
+      pdf.addImage(imgData, 'JPEG', margin, position, scaledWidth, scaledHeight);
       heightLeft -= pageHeight;
       
       while (heightLeft > 0) {
-        position = heightLeft - scaledHeight + imgY;
+        position = heightLeft - scaledHeight + margin;
         pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', imgX, position, scaledWidth, scaledHeight);
+        pdf.addImage(imgData, 'JPEG', margin, position, scaledWidth, scaledHeight);
         heightLeft -= pageHeight;
       }
       
