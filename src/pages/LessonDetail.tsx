@@ -9,7 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import DOMPurify from 'dompurify';
-import html2pdf from 'html2pdf.js';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface Lesson {
   id: string;
@@ -185,33 +186,66 @@ export default function LessonDetail() {
       pdfContent.style.padding = '20px';
       pdfContent.style.backgroundColor = 'white';
       pdfContent.style.color = 'black';
+      pdfContent.style.width = '800px';
+      pdfContent.style.position = 'absolute';
+      pdfContent.style.left = '-9999px';
       
       pdfContent.innerHTML = `
-        <h1 style="font-size: 24px; margin-bottom: 10px; text-align: right;">${lesson.title}</h1>
-        <p style="color: #666; margin-bottom: 5px; text-align: right;">${lesson.topic.name}</p>
+        <h1 style="font-size: 24px; margin-bottom: 10px; text-align: right;">${DOMPurify.sanitize(lesson.title)}</h1>
+        <p style="color: #666; margin-bottom: 5px; text-align: right;">${DOMPurify.sanitize(lesson.topic.name)}</p>
         <p style="color: #666; margin-bottom: 20px; text-align: right;">${formatDate(lesson.created_at)}</p>
-        <p style="font-size: 16px; color: #444; margin-bottom: 20px; text-align: right;">${lesson.summary}</p>
+        <p style="font-size: 16px; color: #444; margin-bottom: 20px; text-align: right;">${DOMPurify.sanitize(lesson.summary)}</p>
         <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
         <div style="text-align: right; line-height: 1.8;">${DOMPurify.sanitize(lesson.content)}</div>
       `;
       
-      const opt = {
-        margin: [15, 15, 15, 15],
-        filename: `${lesson.title}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2,
-          useCORS: true,
-          letterRendering: true
-        },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'portrait' 
-        }
-      };
+      document.body.appendChild(pdfContent);
       
-      await html2pdf().set(opt).from(pdfContent).save();
+      // Use html2canvas to render the content
+      const canvas = await html2canvas(pdfContent, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+      
+      document.body.removeChild(pdfContent);
+      
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min((pdfWidth - 20) / imgWidth, (pdfHeight - 20) / imgHeight);
+      const imgX = 10;
+      const imgY = 10;
+      const scaledWidth = imgWidth * ratio;
+      const scaledHeight = imgHeight * ratio;
+      
+      // Handle multi-page content
+      const pageHeight = pdfHeight - 20;
+      let heightLeft = scaledHeight;
+      let position = imgY;
+      let page = 1;
+      
+      pdf.addImage(imgData, 'JPEG', imgX, position, scaledWidth, scaledHeight);
+      heightLeft -= pageHeight;
+      
+      while (heightLeft > 0) {
+        position = heightLeft - scaledHeight + imgY;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', imgX, position, scaledWidth, scaledHeight);
+        heightLeft -= pageHeight;
+        page++;
+      }
+      
+      pdf.save(`${lesson.title}.pdf`);
       
       toast({
         title: "הורדה הושלמה",
