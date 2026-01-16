@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Heart, MessageCircle, Calendar, Clock, Share2, Eye } from "lucide-react";
+import { ArrowRight, Heart, MessageCircle, Calendar, Clock, Share2, Eye, Printer } from "lucide-react";
 import { trackLessonView, formatViewCount } from "@/lib/viewTracker";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -291,6 +291,16 @@ export default function LessonDetail() {
                 >
                   <Share2 className="h-4 w-4" />
                   שתף
+                </Button>
+
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.print()}
+                  className="gap-1"
+                >
+                  <Printer className="h-4 w-4" />
+                  הדפס
                 </Button>
               </div>
             </div>
