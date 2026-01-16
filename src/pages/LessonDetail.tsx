@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Heart, MessageCircle, Calendar, Clock, Share2, Eye, Printer } from "lucide-react";
+import { ArrowRight, Heart, MessageCircle, Calendar, Clock, Share2, Eye, Printer, Download } from "lucide-react";
 import { trackLessonView, formatViewCount } from "@/lib/viewTracker";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import DOMPurify from 'dompurify';
+import html2pdf from 'html2pdf.js';
 
 interface Lesson {
   id: string;
@@ -41,7 +42,9 @@ export default function LessonDetail() {
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [relatedLessons, setRelatedLessons] = useState<RelatedLesson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const viewTrackedRef = useRef(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (id) {
@@ -166,6 +169,63 @@ export default function LessonDetail() {
         title: "הקישור הועתק",
         description: "הקישור הועתק ללוח",
       });
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!lesson || !contentRef.current) return;
+    
+    setIsGeneratingPdf(true);
+    
+    try {
+      // Create a temporary container for PDF generation
+      const pdfContent = document.createElement('div');
+      pdfContent.style.direction = 'rtl';
+      pdfContent.style.fontFamily = 'Arial, sans-serif';
+      pdfContent.style.padding = '20px';
+      pdfContent.style.backgroundColor = 'white';
+      pdfContent.style.color = 'black';
+      
+      pdfContent.innerHTML = `
+        <h1 style="font-size: 24px; margin-bottom: 10px; text-align: right;">${lesson.title}</h1>
+        <p style="color: #666; margin-bottom: 5px; text-align: right;">${lesson.topic.name}</p>
+        <p style="color: #666; margin-bottom: 20px; text-align: right;">${formatDate(lesson.created_at)}</p>
+        <p style="font-size: 16px; color: #444; margin-bottom: 20px; text-align: right;">${lesson.summary}</p>
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
+        <div style="text-align: right; line-height: 1.8;">${DOMPurify.sanitize(lesson.content)}</div>
+      `;
+      
+      const opt = {
+        margin: [15, 15, 15, 15],
+        filename: `${lesson.title}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          letterRendering: true
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait' 
+        }
+      };
+      
+      await html2pdf().set(opt).from(pdfContent).save();
+      
+      toast({
+        title: "הורדה הושלמה",
+        description: "קובץ ה-PDF נשמר בהצלחה",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "שגיאה",
+        description: "לא ניתן ליצור את קובץ ה-PDF",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingPdf(false);
     }
   };
 
@@ -302,6 +362,17 @@ export default function LessonDetail() {
                   <Printer className="h-4 w-4" />
                   הדפס
                 </Button>
+
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleDownloadPdf}
+                  disabled={isGeneratingPdf}
+                  className="gap-1"
+                >
+                  <Download className="h-4 w-4" />
+                  {isGeneratingPdf ? 'מייצר...' : 'הורד PDF'}
+                </Button>
               </div>
             </div>
           </header>
@@ -309,6 +380,7 @@ export default function LessonDetail() {
           <Card>
             <CardContent className="prose prose-lg max-w-none p-8 text-right">
               <div 
+                ref={contentRef}
                 className="leading-relaxed text-foreground hebrew-content content-typography"
                 style={{ direction: 'rtl' }}
                 dangerouslySetInnerHTML={{ 
