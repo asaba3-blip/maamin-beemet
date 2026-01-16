@@ -324,11 +324,6 @@ export default function LessonDetail() {
                 alt={lesson.title}
                 className="w-full h-64 md:h-96 object-contain"
               />
-              <div className="absolute top-4 right-4">
-                <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm">
-                  {lesson.topic.name}
-                </Badge>
-              </div>
             </div>
           )}
 
