@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useCanonical } from "@/hooks/useCanonical";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
@@ -55,6 +56,7 @@ const demoLessons = [
 ];
 
 const Index = () => {
+  useCanonical("/");
   const { user, isAdmin, isLoading } = useAuth();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
