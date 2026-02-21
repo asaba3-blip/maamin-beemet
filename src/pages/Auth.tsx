@@ -10,8 +10,10 @@ import { Separator } from "@/components/ui/separator";
 import { BookOpen, Mail, Lock, LogIn, UserPlus } from "lucide-react";
 import { signUpSchema, signInSchema } from "@/lib/validation";
 import { useToast } from "@/hooks/use-toast";
+import { useCanonical } from "@/hooks/useCanonical";
 
 export default function Auth() {
+  useCanonical("/auth");
   const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();

@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
+import { useCanonical } from "@/hooks/useCanonical";
 import DOMPurify from 'dompurify';
 
 interface Lesson {
@@ -35,6 +36,7 @@ interface RelatedLesson {
 
 export default function LessonDetail() {
   const { id } = useParams<{ id: string }>();
+  useCanonical(id ? `/lesson/${id}` : undefined);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
