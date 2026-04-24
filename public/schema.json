@@ -4,12 +4,8 @@
   "name": "לימודי מקרא ויהדות",
   "alternateName": "מקור לחכמה ותורה",
   "description": "אתר לימוד מקרא, אמונה ויהדות עם שיעורים מעמיקים ותובנות רוחניות",
-  "url": "https://yourdomain.com",
-  "logo": "https://yourdomain.com/logo.png",
-  "sameAs": [
-    "https://facebook.com/yourpage",
-    "https://twitter.com/yourhandle"
-  ],
+  "url": "https://maamin-beemet.lovable.app",
+  "logo": "https://maamin-beemet.lovable.app/placeholder.svg",
   "address": {
     "@type": "PostalAddress",
     "addressCountry": "IL",
@@ -26,25 +22,28 @@
         "description": "שיעורים מעמיקים בפרשיות השבוע",
         "provider": {
           "@type": "Organization",
-          "name": "לימודי מקרא ויהדות"
-        }
-      },
-      {
-        "@type": "Course", 
-        "name": "הלכה",
-        "description": "שיעורים בהלכה יהודית",
-        "provider": {
-          "@type": "Organization",
-          "name": "לימודי מקרא ויהדות"
+          "name": "לימודי מקרא ויהדות",
+          "url": "https://maamin-beemet.lovable.app"
         }
       },
       {
         "@type": "Course",
-        "name": "חגים יהודיים", 
+        "name": "הלכה",
+        "description": "שיעורים בהלכה יהודית",
+        "provider": {
+          "@type": "Organization",
+          "name": "לימודי מקרא ויהדות",
+          "url": "https://maamin-beemet.lovable.app"
+        }
+      },
+      {
+        "@type": "Course",
+        "name": "חגים יהודיים",
         "description": "שיעורים על חגי ישראל ומועדים",
         "provider": {
           "@type": "Organization",
-          "name": "לימודי מקרא ויהדות"
+          "name": "לימודי מקרא ויהדות",
+          "url": "https://maamin-beemet.lovable.app"
         }
       }
     ]
