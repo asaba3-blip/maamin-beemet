@@ -9,7 +9,7 @@ export const lessonSchema = z.object({
   summary: z.string()
     .trim()
     .min(1, { message: "תקציר השיעור נדרש" })
-    .max(500, { message: "תקציר השיעור חייב להיות עד 500 תווים" }),
+    .max(1000, { message: "תקציר השיעור חייב להיות עד 1,000 תווים" }),
   content: z.string()
     .trim()
     .min(1, { message: "תוכן השיעור נדרש" }),
