@@ -4,8 +4,8 @@
   "name": "לימודי מקרא ויהדות",
   "alternateName": "מקור לחכמה ותורה",
   "description": "אתר לימוד מקרא, אמונה ויהדות עם שיעורים מעמיקים ותובנות רוחניות",
-  "url": "https://maamin-beemet.lovable.app",
-  "logo": "https://maamin-beemet.lovable.app/placeholder.svg",
+  "url": "https://maamin-beemet.co.il",
+  "logo": "https://maamin-beemet.co.il/placeholder.svg",
   "address": {
     "@type": "PostalAddress",
     "addressCountry": "IL",
@@ -23,7 +23,7 @@
         "provider": {
           "@type": "Organization",
           "name": "לימודי מקרא ויהדות",
-          "url": "https://maamin-beemet.lovable.app"
+          "url": "https://maamin-beemet.co.il"
         }
       },
       {
@@ -33,7 +33,7 @@
         "provider": {
           "@type": "Organization",
           "name": "לימודי מקרא ויהדות",
-          "url": "https://maamin-beemet.lovable.app"
+          "url": "https://maamin-beemet.co.il"
         }
       },
       {
@@ -43,7 +43,7 @@
         "provider": {
           "@type": "Organization",
           "name": "לימודי מקרא ויהדות",
-          "url": "https://maamin-beemet.lovable.app"
+          "url": "https://maamin-beemet.co.il"
         }
       }
     ]

@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
       throw error
     }
 
-    const baseUrl = 'https://maamin-beemet.lovable.app'
+    const baseUrl = 'https://maamin-beemet.co.il'
     const today = new Date().toISOString().split('T')[0]
 
     // Build sitemap XML

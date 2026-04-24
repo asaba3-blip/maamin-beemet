@@ -6,7 +6,7 @@ const envPath = path.join(projectRoot, '.env');
 const publicDir = path.join(projectRoot, 'public');
 const sitemapPath = path.join(publicDir, 'sitemap.xml');
 
-const BASE_URL = 'https://maamin-beemet.lovable.app';
+const BASE_URL = 'https://maamin-beemet.co.il';
 
 function escapeXml(value = '') {
   return String(value)
