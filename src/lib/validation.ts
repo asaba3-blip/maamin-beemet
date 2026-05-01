@@ -106,7 +106,7 @@ export const commentSchema = z.object({
   content: z.string()
     .trim()
     .min(1, { message: "תוכן התגובה נדרש" })
-    .max(1000, { message: "תגובה חייבת להיות עד 1,000 תווים" }),
+    .max(50, { message: "תגובה חייבת להיות עד 50 תווים" }),
   lesson_id: z.string().uuid({ message: "מזהה שיעור לא תקין" })
 });
 
