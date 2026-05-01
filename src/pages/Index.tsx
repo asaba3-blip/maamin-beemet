@@ -190,27 +190,50 @@ const Index = () => {
       return;
     }
 
-    console.log("Liking lesson:", lessonId);
-    
-    // Handle real likes for logged-in users
-    const { error } = await supabase
-      .from("likes")
-      .upsert({ 
-        lesson_id: lessonId, 
-        user_id: user.id 
-      }, { 
-        onConflict: "lesson_id,user_id" 
-      });
+    const target = realLessons.find((l) => l.id === lessonId);
+    if (!target) return;
+    const wasLiked = !!target.isLiked;
+
+    // Optimistic update
+    setRealLessons((prev) =>
+      prev.map((l) =>
+        l.id === lessonId
+          ? {
+              ...l,
+              isLiked: !wasLiked,
+              likes_count: Math.max(0, (l.likes_count || 0) + (wasLiked ? -1 : 1)),
+            }
+          : l
+      )
+    );
+
+    const { error } = wasLiked
+      ? await supabase
+          .from("likes")
+          .delete()
+          .eq("lesson_id", lessonId)
+          .eq("user_id", user.id)
+      : await supabase.from("likes").insert({ lesson_id: lessonId, user_id: user.id });
 
     if (error) {
-      console.error("Error liking lesson:", error);
+      console.error("Error toggling like:", error);
+      // Revert
+      setRealLessons((prev) =>
+        prev.map((l) =>
+          l.id === lessonId
+            ? {
+                ...l,
+                isLiked: wasLiked,
+                likes_count: Math.max(0, (l.likes_count || 0) + (wasLiked ? 1 : -1)),
+              }
+            : l
+        )
+      );
       toast({
         title: "שגיאה",
-        description: "לא ניתן לסמן את השיעור במועדפים",
+        description: "לא ניתן לעדכן את הלייק",
         variant: "destructive",
       });
-    } else {
-      fetchLessons(); // Refresh lessons
     }
   };
 
