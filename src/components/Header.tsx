@@ -92,6 +92,10 @@ export function Header({
                         <Settings className="h-4 w-4 ml-2" />
                         <span>פאנל ניהול</span>
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => window.open('/admin/analytics', '_blank')}>
+                        <BarChart3 className="h-4 w-4 ml-2" />
+                        <span>דשבורד אנליטיקה</span>
+                      </DropdownMenuItem>
                     </>
                   )}
                   <DropdownMenuSeparator />
