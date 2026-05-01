@@ -442,6 +442,15 @@ export default function LessonDetail() {
             </CardContent>
           </Card>
 
+          <LessonComments
+            lessonId={lesson.id}
+            onCountChange={(delta) =>
+              setLesson((prev) =>
+                prev ? { ...prev, comments_count: Math.max(0, prev.comments_count + delta) } : prev
+              )
+            }
+          />
+
           <div className="text-center mt-8">
             <Button 
               variant="outline" 
