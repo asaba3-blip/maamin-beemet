@@ -110,11 +110,17 @@ const AdminAnalytics = () => {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8" dir="rtl">
       <div className="container mx-auto max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">דשבורד אנליטיקה</h1>
-          <p className="text-muted-foreground mt-2">
-            מעקב כניסות לאתר ולשיעורים
-          </p>
+        <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-3xl font-bold">דשבורד אנליטיקה</h1>
+            <p className="text-muted-foreground mt-2">
+              מעקב כניסות לאתר ולשיעורים
+            </p>
+          </div>
+          <Button variant="outline" onClick={() => navigate("/")} className="gap-2">
+            <ArrowRight className="h-4 w-4" />
+            חזרה לדף הבית
+          </Button>
         </div>
 
         {/* Summary Cards */}
