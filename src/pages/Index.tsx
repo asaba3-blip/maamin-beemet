@@ -71,7 +71,8 @@ const Index = () => {
     fetchSiteSettings();
     fetchTopics();
     fetchLessons(); // Always fetch lessons, regardless of user status
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
 
   const fetchSiteSettings = async () => {
