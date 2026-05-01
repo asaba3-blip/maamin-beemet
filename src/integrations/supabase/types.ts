@@ -302,6 +302,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_lesson_analytics: {
+        Args: never
+        Returns: {
+          lesson_id: string
+          lesson_title: string
+          views_48h: number
+          views_today: number
+          views_total: number
+          views_week: number
+        }[]
+      }
       get_public_profiles: {
         Args: never
         Returns: {
@@ -311,6 +322,13 @@ export type Database = {
           id: string
           updated_at: string
           user_id: string
+        }[]
+      }
+      get_views_daily: {
+        Args: { days_back?: number }
+        Returns: {
+          day: string
+          views: number
         }[]
       }
       has_role: {
