@@ -34,6 +34,7 @@ interface DailyView {
 
 const AdminAnalytics = () => {
   const { user, isAdmin, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [rows, setRows] = useState<LessonAnalytics[]>([]);
   const [daily, setDaily] = useState<DailyView[]>([]);
   const [loading, setLoading] = useState(true);
