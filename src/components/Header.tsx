@@ -1,4 +1,4 @@
-import { BookOpen, User, Settings, LogOut } from "lucide-react";
+import { BookOpen, User, Settings, LogOut, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { User as UserType } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
