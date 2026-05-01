@@ -1,6 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -32,6 +34,7 @@ interface DailyView {
 
 const AdminAnalytics = () => {
   const { user, isAdmin, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [rows, setRows] = useState<LessonAnalytics[]>([]);
   const [daily, setDaily] = useState<DailyView[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,11 +110,17 @@ const AdminAnalytics = () => {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8" dir="rtl">
       <div className="container mx-auto max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">דשבורד אנליטיקה</h1>
-          <p className="text-muted-foreground mt-2">
-            מעקב כניסות לאתר ולשיעורים
-          </p>
+        <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-3xl font-bold">דשבורד אנליטיקה</h1>
+            <p className="text-muted-foreground mt-2">
+              מעקב כניסות לאתר ולשיעורים
+            </p>
+          </div>
+          <Button variant="outline" onClick={() => navigate("/")} className="gap-2">
+            <ArrowRight className="h-4 w-4" />
+            חזרה לדף הבית
+          </Button>
         </div>
 
         {/* Summary Cards */}
