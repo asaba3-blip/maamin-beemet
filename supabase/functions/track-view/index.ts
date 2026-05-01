@@ -49,7 +49,33 @@ Deno.serve(async (req) => {
     // Initialize Supabase client with service role for bypassing RLS
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // If the request is authenticated, skip counting for admins
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      try {
+        const token = authHeader.replace("Bearer ", "");
+        const authClient = createClient(supabaseUrl, supabaseAnonKey);
+        const { data: claimsData } = await authClient.auth.getClaims(token);
+        const userId = claimsData?.claims?.sub;
+        if (userId) {
+          const { data: isAdmin } = await supabase.rpc("has_role", {
+            _user_id: userId,
+            _role: "admin",
+          });
+          if (isAdmin === true) {
+            return new Response(
+              JSON.stringify({ success: true, counted: false, reason: "admin" }),
+              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
+      } catch (e) {
+        console.error("Admin check failed, proceeding as anonymous:", e);
+      }
+    }
 
     // Check if this visitor already viewed this lesson within the time window
     const windowStart = new Date();
