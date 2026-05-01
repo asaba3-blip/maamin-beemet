@@ -1,4 +1,4 @@
-import { BookOpen, User, Settings, LogOut } from "lucide-react";
+import { BookOpen, User, Settings, LogOut, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { User as UserType } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
@@ -91,6 +91,10 @@ export function Header({
                       <DropdownMenuItem onClick={onAdminToggle}>
                         <Settings className="h-4 w-4 ml-2" />
                         <span>פאנל ניהול</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => window.open('/admin/analytics', '_blank')}>
+                        <BarChart3 className="h-4 w-4 ml-2" />
+                        <span>דשבורד אנליטיקה</span>
                       </DropdownMenuItem>
                     </>
                   )}
