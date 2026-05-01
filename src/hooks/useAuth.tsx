@@ -42,12 +42,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        checkAdminStatus(session.user.id);
+        await checkAdminStatus(session.user.id);
+      } else {
+        setIsAdmin(false);
       }
       
       setIsLoading(false);
@@ -56,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkAdminStatus = async (userId: string) => {
+  const checkAdminStatus = async (userId: string): Promise<boolean> => {
     try {
       // Check if user has admin role in user_roles table (security fix)
       const { data, error } = await supabase
@@ -72,11 +74,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await createProfile(userId);
         }
         setIsAdmin(false);
+        return false;
       } else {
-        setIsAdmin(!!data);
+        const hasAdminRole = !!data;
+        setIsAdmin(hasAdminRole);
+        return hasAdminRole;
       }
     } catch (error) {
       setIsAdmin(false);
+      return false;
     }
   };
 
