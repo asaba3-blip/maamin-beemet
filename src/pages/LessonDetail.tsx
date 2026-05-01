@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import { useCanonical } from "@/hooks/useCanonical";
 import DOMPurify from 'dompurify';
+import { LessonComments } from "@/components/LessonComments";
 
 interface Lesson {
   id: string;
