@@ -1,5 +1,5 @@
 import { BookOpen, User, Settings, LogOut, BarChart3 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { User as UserType } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { SearchDropdown } from "@/components/SearchDropdown";
@@ -41,6 +41,8 @@ export function Header({
   headerTitle = "לימודי מקרא ויהדות",
   headerSubtitle = "מקור לחכמה ותורה"
 }: HeaderProps) {
+  const navigate = useNavigate();
+
   return (
     <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
       <div className="container max-w-7xl mx-auto px-4 py-4">
@@ -92,7 +94,7 @@ export function Header({
                         <Settings className="h-4 w-4 ml-2" />
                         <span>פאנל ניהול</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => { window.location.href = '/admin/analytics'; }}>
+                      <DropdownMenuItem onClick={() => navigate('/admin/analytics')}>
                         <BarChart3 className="h-4 w-4 ml-2" />
                         <span>דשבורד אנליטיקה</span>
                       </DropdownMenuItem>
