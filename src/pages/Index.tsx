@@ -135,13 +135,24 @@ const Index = () => {
       .from("topics")
       .select("id, name");
 
+    // Fetch current user's likes
+    let likedSet = new Set<string>();
+    if (user) {
+      const { data: myLikes } = await supabase
+        .from("likes")
+        .select("lesson_id")
+        .eq("user_id", user.id);
+      likedSet = new Set((myLikes || []).map((l) => l.lesson_id));
+    }
+
     // Map topics to lessons
     const lessonsWithTopics = lessonsData?.map(lesson => {
       const topicIds = lessonTopicsData?.filter(lt => lt.lesson_id === lesson.id).map(lt => lt.topic_id) || [];
-      const lessonTopics = topicsData?.filter(t => topicIds.includes(t.id)) || [];
-      
+      const lessonTopics = topicIds.map(id => topicsData?.find(t => t.id === id)).filter(Boolean) || [];
+
       return {
         ...lesson,
+        isLiked: likedSet.has(lesson.id),
         lesson_topics: lessonTopics.map(topic => ({ topics: topic }))
       };
     }) || [];
