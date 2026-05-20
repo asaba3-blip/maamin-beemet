@@ -336,7 +336,7 @@ export default function Auth() {
             <button className="text-primary hover:underline mx-1">מדיניות הפרטיות</button>
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
