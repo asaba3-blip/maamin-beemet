@@ -504,7 +504,7 @@ export default function LessonDetail() {
             </Button>
           </div>
         </article>
-      </div>
+      </main>
     </div>
   );
 }
