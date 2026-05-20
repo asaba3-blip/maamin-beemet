@@ -40,6 +40,19 @@ export function LessonComments({ lessonId, discussionPrompt, onCountChange }: Pr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonId]);
 
+  useEffect(() => {
+    if (loading) return;
+    const hash = window.location.hash;
+    if (hash.startsWith("#comment-")) {
+      const el = document.getElementById(hash.slice(1));
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("ring-2", "ring-primary");
+        setTimeout(() => el.classList.remove("ring-2", "ring-primary"), 2500);
+      }
+    }
+  }, [loading, comments]);
+
   const fetchComments = async () => {
     setLoading(true);
     const { data: cData, error } = await supabase
@@ -194,7 +207,8 @@ export function LessonComments({ lessonId, discussionPrompt, onCountChange }: Pr
             {comments.map((c) => (
               <div
                 key={c.id}
-                className="flex gap-3 p-4 bg-muted/40 rounded-md"
+                id={`comment-${c.id}`}
+                className="flex gap-3 p-4 bg-muted/40 rounded-md scroll-mt-24 target:ring-2 target:ring-primary"
               >
                 <Avatar className="h-10 w-10 shrink-0">
                   {c.author_avatar && (
