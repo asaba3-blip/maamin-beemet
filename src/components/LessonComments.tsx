@@ -145,6 +145,7 @@ export function LessonComments({ lessonId, onCountChange }: Props) {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               maxLength={MAX_LEN}
+              aria-label="כתיבת תגובה"
               placeholder="כתוב תגובה (עד 50 תווים)..."
               className="text-right"
               dir="rtl"
@@ -209,6 +210,7 @@ export function LessonComments({ lessonId, onCountChange }: Props) {
                         <Button
                           variant="ghost"
                           size="sm"
+                          aria-label="מחק תגובה"
                           onClick={() => handleDelete(c.id)}
                           className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
                         >

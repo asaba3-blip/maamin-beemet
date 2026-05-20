@@ -337,7 +337,7 @@ export default function LessonDetail() {
 
             {relatedLessons.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-muted-foreground mb-3">שיעורים קשורים:</h3>
+                <h2 className="text-sm font-semibold text-muted-foreground mb-3">שיעורים קשורים:</h2>
                 <div className="flex flex-wrap gap-2">
                   {relatedLessons.map((relatedLesson) => (
                     <Button

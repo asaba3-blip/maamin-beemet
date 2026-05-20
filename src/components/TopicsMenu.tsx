@@ -121,7 +121,9 @@ export function TopicsMenu({ selectedTopic, onTopicSelect }: TopicsMenuProps) {
   return (
     <Card className="h-fit shadow-card">
       <CardHeader>
-        <CardTitle className="text-lg text-center">מפתח נושאים</CardTitle>
+        <CardTitle asChild>
+          <h2 className="text-lg text-center">מפתח נושאים</h2>
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         <Button
