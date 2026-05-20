@@ -251,7 +251,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
         topic_id: selectedTopics.length > 0 ? selectedTopics[0] : null,
         image_url: uploadedImageUrl,
         published,
-        related_lessons: relatedLessons
+        related_lessons: relatedLessons,
+        discussion_prompt: discussionPrompt.trim() || null,
       };
 
       let lessonId: string;
