@@ -34,6 +34,7 @@ interface Lesson {
   published: boolean;
   created_at: string;
   related_lessons?: string[];
+  discussion_prompt?: string | null;
   topics?: Topic;
   lesson_topics?: Array<{
     topic_id: string;
