@@ -326,6 +326,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
       setProcessedContent("");
       setImageFile(null);
       setImageUrl("");
+      setDiscussionPrompt("");
       setEditingLesson(null);
       
       // Refresh lessons
