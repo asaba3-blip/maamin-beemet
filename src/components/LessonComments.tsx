@@ -194,7 +194,8 @@ export function LessonComments({ lessonId, discussionPrompt, onCountChange }: Pr
             {comments.map((c) => (
               <div
                 key={c.id}
-                className="flex gap-3 p-4 bg-muted/40 rounded-md"
+                id={`comment-${c.id}`}
+                className="flex gap-3 p-4 bg-muted/40 rounded-md scroll-mt-24 target:ring-2 target:ring-primary"
               >
                 <Avatar className="h-10 w-10 shrink-0">
                   {c.author_avatar && (
