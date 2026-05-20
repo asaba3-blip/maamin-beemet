@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Trash2, MessageCircle } from "lucide-react";
+import { Trash2, MessageCircle, Sparkles } from "lucide-react";
 import { commentSchema } from "@/lib/validation";
 
 interface CommentRow {
@@ -21,12 +21,13 @@ interface CommentRow {
 
 interface Props {
   lessonId: string;
+  discussionPrompt?: string | null;
   onCountChange?: (delta: number) => void;
 }
 
-const MAX_LEN = 50;
+const MAX_LEN = 1000;
 
-export function LessonComments({ lessonId, onCountChange }: Props) {
+export function LessonComments({ lessonId, discussionPrompt, onCountChange }: Props) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [comments, setComments] = useState<CommentRow[]>([]);
@@ -37,7 +38,7 @@ export function LessonComments({ lessonId, onCountChange }: Props) {
   useEffect(() => {
     if (lessonId) fetchComments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lessonId, user]);
+  }, [lessonId]);
 
   const fetchComments = async () => {
     setLoading(true);
@@ -130,6 +131,7 @@ export function LessonComments({ lessonId, onCountChange }: Props) {
 
   const remaining = MAX_LEN - content.length;
   const tooLong = content.length > MAX_LEN;
+  const prompt = discussionPrompt?.trim();
 
   return (
     <Card className="mt-8">
@@ -139,6 +141,18 @@ export function LessonComments({ lessonId, onCountChange }: Props) {
           <MessageCircle className="h-6 w-6 text-primary" />
         </div>
 
+        {prompt && (
+          <div className="mb-6 p-4 rounded-md border border-primary/20 bg-primary/5">
+            <div className="flex items-start justify-end gap-2">
+              <div className="flex-1 text-right">
+                <p className="text-sm font-semibold text-primary mb-1">שאלה לקוראים</p>
+                <p className="text-foreground leading-relaxed whitespace-pre-wrap">{prompt}</p>
+              </div>
+              <Sparkles className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+            </div>
+          </div>
+        )}
+
         {user ? (
           <div className="mb-6">
             <Textarea
@@ -146,10 +160,10 @@ export function LessonComments({ lessonId, onCountChange }: Props) {
               onChange={(e) => setContent(e.target.value)}
               maxLength={MAX_LEN}
               aria-label="כתיבת תגובה"
-              placeholder="כתוב תגובה (עד 50 תווים)..."
+              placeholder="שתפו מחשבה, שאלה או חוויה מהשיעור..."
               className="text-right"
               dir="rtl"
-              rows={2}
+              rows={4}
             />
             <div className="flex items-center justify-between mt-2">
               <span
@@ -167,26 +181,13 @@ export function LessonComments({ lessonId, onCountChange }: Props) {
               </Button>
             </div>
           </div>
-        ) : (
-          <div className="mb-6 p-4 bg-muted rounded-md text-center">
-            <p className="text-muted-foreground mb-2">
-              יש להתחבר כדי לכתוב תגובה
-            </p>
-            <Button asChild variant="default" size="sm">
-              <Link to="/auth">התחבר</Link>
-            </Button>
-          </div>
-        )}
+        ) : null}
 
         {loading ? (
           <p className="text-muted-foreground text-center py-4">טוען תגובות...</p>
-        ) : !user ? (
-          <p className="text-muted-foreground text-center py-4 text-sm">
-            התחבר כדי לראות את התגובות
-          </p>
         ) : comments.length === 0 ? (
           <p className="text-muted-foreground text-center py-4">
-            עדיין אין תגובות. היה הראשון להגיב!
+            פתחו את הדיון — מה דעתכם?
           </p>
         ) : (
           <div className="space-y-4">
@@ -229,6 +230,17 @@ export function LessonComments({ lessonId, onCountChange }: Props) {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {!user && (
+          <div className="mt-6 p-4 bg-muted rounded-md text-center">
+            <p className="text-muted-foreground mb-2">
+              רוצים להצטרף לדיון?
+            </p>
+            <Button asChild variant="default" size="sm">
+              <Link to="/auth">התחבר כדי להגיב</Link>
+            </Button>
           </div>
         )}
       </CardContent>
