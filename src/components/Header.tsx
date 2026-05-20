@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { User as UserType } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { SearchDropdown } from "@/components/SearchDropdown";
+import { AdminCommentsBell } from "@/components/AdminCommentsBell";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
