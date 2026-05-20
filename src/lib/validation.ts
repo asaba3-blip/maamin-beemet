@@ -22,6 +22,11 @@ export const lessonSchema = z.object({
     .url({ message: "כתובת URL לא תקינה" })
     .optional()
     .or(z.literal('')),
+  discussion_prompt: z.string()
+    .trim()
+    .max(300, { message: "שאלה לדיון חייבת להיות עד 300 תווים" })
+    .optional()
+    .or(z.literal('')),
   published: z.boolean()
 });
 
