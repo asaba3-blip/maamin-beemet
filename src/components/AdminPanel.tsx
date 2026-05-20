@@ -539,6 +539,21 @@ export function AdminPanel({ user }: AdminPanelProps) {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="discussion-prompt">שאלה לדיון (אופציונלי)</Label>
+              <Textarea
+                id="discussion-prompt"
+                value={discussionPrompt}
+                onChange={(e) => setDiscussionPrompt(e.target.value)}
+                placeholder="לדוגמה: איך יישמתם את זה? מה החלק שהכי הפתיע אתכם? איזו שאלה נשארה לכם פתוחה?"
+                rows={2}
+                maxLength={300}
+              />
+              <p className="text-xs text-muted-foreground">
+                שאלה זו תופיע מעל אזור התגובות ותעודד את הקוראים להגיב. ({discussionPrompt.length}/300)
+              </p>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="image-upload">תמונה לשיעור</Label>
