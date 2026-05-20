@@ -201,6 +201,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
         topic_ids: selectedTopics,
         related_lessons: relatedLessons,
         image_url: imageUrl || '',
+        discussion_prompt: discussionPrompt || '',
         published
       });
 
