@@ -140,7 +140,14 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      <Helmet>
+        <title>התחברות - לימודי מקרא ויהדות</title>
+        <meta name="description" content="התחברות והרשמה לאתר לימודי מקרא ויהדות - גישה לשיעורים, תגובות וסימון מועדפים." />
+        <meta property="og:title" content="התחברות - לימודי מקרא ויהדות" />
+        <meta property="og:description" content="התחברות והרשמה לאתר לימודי מקרא ויהדות." />
+        <meta property="og:url" content="https://maamin-beemet.co.il/auth" />
+      </Helmet>
+      <main className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <BookOpen className="h-8 w-8 text-primary" />
