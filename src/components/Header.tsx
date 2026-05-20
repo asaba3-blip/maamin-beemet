@@ -75,6 +75,8 @@ export function Header({
               <span>אודות</span>
             </Button>
             
+            {isAdmin && <AdminCommentsBell />}
+
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
