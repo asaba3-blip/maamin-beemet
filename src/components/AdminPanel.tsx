@@ -34,6 +34,7 @@ interface Lesson {
   published: boolean;
   created_at: string;
   related_lessons?: string[];
+  discussion_prompt?: string | null;
   topics?: Topic;
   lesson_topics?: Array<{
     topic_id: string;
@@ -63,6 +64,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
   const [processedContent, setProcessedContent] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState("");
+  const [discussionPrompt, setDiscussionPrompt] = useState("");
 
   useEffect(() => {
     fetchTopics();
@@ -199,6 +201,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
         topic_ids: selectedTopics,
         related_lessons: relatedLessons,
         image_url: imageUrl || '',
+        discussion_prompt: discussionPrompt || '',
         published
       });
 
@@ -248,7 +251,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
         topic_id: selectedTopics.length > 0 ? selectedTopics[0] : null,
         image_url: uploadedImageUrl,
         published,
-        related_lessons: relatedLessons
+        related_lessons: relatedLessons,
+        discussion_prompt: discussionPrompt.trim() || null,
       };
 
       let lessonId: string;
@@ -322,6 +326,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
       setProcessedContent("");
       setImageFile(null);
       setImageUrl("");
+      setDiscussionPrompt("");
       setEditingLesson(null);
       
       // Refresh lessons
@@ -353,6 +358,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
     
     setPublished(lesson.published);
     setImageUrl(lesson.image_url || "");
+    setDiscussionPrompt(lesson.discussion_prompt || "");
   };
 
   const handleDelete = async (lessonId: string) => {
@@ -531,6 +537,21 @@ export function AdminPanel({ user }: AdminPanelProps) {
                 rows={3}
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="discussion-prompt">שאלה לדיון (אופציונלי)</Label>
+              <Textarea
+                id="discussion-prompt"
+                value={discussionPrompt}
+                onChange={(e) => setDiscussionPrompt(e.target.value)}
+                placeholder="לדוגמה: איך יישמתם את זה? מה החלק שהכי הפתיע אתכם? איזו שאלה נשארה לכם פתוחה?"
+                rows={2}
+                maxLength={300}
+              />
+              <p className="text-xs text-muted-foreground">
+                שאלה זו תופיע מעל אזור התגובות ותעודד את הקוראים להגיב. ({discussionPrompt.length}/300)
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

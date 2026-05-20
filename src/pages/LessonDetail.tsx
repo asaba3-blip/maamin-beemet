@@ -486,6 +486,7 @@ export default function LessonDetail() {
 
           <LessonComments
             lessonId={lesson.id}
+            discussionPrompt={(lesson as any).discussion_prompt}
             onCountChange={(delta) =>
               setLesson((prev) =>
                 prev ? { ...prev, comments_count: Math.max(0, prev.comments_count + delta) } : prev

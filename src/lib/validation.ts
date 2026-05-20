@@ -22,6 +22,11 @@ export const lessonSchema = z.object({
     .url({ message: "כתובת URL לא תקינה" })
     .optional()
     .or(z.literal('')),
+  discussion_prompt: z.string()
+    .trim()
+    .max(300, { message: "שאלה לדיון חייבת להיות עד 300 תווים" })
+    .optional()
+    .or(z.literal('')),
   published: z.boolean()
 });
 
@@ -106,7 +111,7 @@ export const commentSchema = z.object({
   content: z.string()
     .trim()
     .min(1, { message: "תוכן התגובה נדרש" })
-    .max(50, { message: "תגובה חייבת להיות עד 50 תווים" }),
+    .max(1000, { message: "תגובה חייבת להיות עד 1,000 תווים" }),
   lesson_id: z.string().uuid({ message: "מזהה שיעור לא תקין" })
 });
 
