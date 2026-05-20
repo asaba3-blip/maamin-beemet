@@ -64,6 +64,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
   const [processedContent, setProcessedContent] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState("");
+  const [discussionPrompt, setDiscussionPrompt] = useState("");
 
   useEffect(() => {
     fetchTopics();
