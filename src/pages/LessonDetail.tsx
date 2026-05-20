@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { ArrowRight, Heart, MessageCircle, Calendar, Clock, Share2, Eye, Printer, Download } from "lucide-react";
 import { trackLessonView, formatViewCount } from "@/lib/viewTracker";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,15 @@ import { useToast } from "@/components/ui/use-toast";
 import { useCanonical } from "@/hooks/useCanonical";
 import DOMPurify from 'dompurify';
 import { LessonComments } from "@/components/LessonComments";
+
+const SITE_BASE = "https://maamin-beemet.co.il";
+const SITE_NAME = "לימודי מקרא ויהדות";
+
+function truncate(text: string, max = 155) {
+  const clean = (text || "").replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  return clean.slice(0, max - 1).trimEnd() + "…";
+}
 
 interface Lesson {
   id: string;
@@ -307,9 +317,41 @@ export default function LessonDetail() {
     );
   }
 
+  const pageTitle = `${lesson.title} | ${SITE_NAME}`.slice(0, 60);
+  const pageDescription = truncate(lesson.summary, 155);
+  const lessonUrl = `${SITE_BASE}/lesson/${lesson.id}`;
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: lesson.title,
+    description: pageDescription,
+    datePublished: lesson.created_at,
+    inLanguage: "he",
+    mainEntityOfPage: lessonUrl,
+    ...(lesson.image_url ? { image: lesson.image_url } : {}),
+    publisher: {
+      "@type": "EducationalOrganization",
+      name: SITE_NAME,
+      url: SITE_BASE,
+    },
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-background/50">
-      <div className="container mx-auto px-4 py-8">
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={lesson.title} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:url" content={lessonUrl} />
+        {lesson.image_url && <meta property="og:image" content={lesson.image_url} />}
+        <meta name="twitter:title" content={lesson.title} />
+        <meta name="twitter:description" content={pageDescription} />
+        {lesson.image_url && <meta name="twitter:image" content={lesson.image_url} />}
+        <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
+      </Helmet>
+      <main className="container mx-auto px-4 py-8">
         <Button 
           variant="ghost" 
           onClick={() => navigate("/")}
