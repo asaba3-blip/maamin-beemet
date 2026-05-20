@@ -358,6 +358,7 @@ export function AdminPanel({ user }: AdminPanelProps) {
     
     setPublished(lesson.published);
     setImageUrl(lesson.image_url || "");
+    setDiscussionPrompt(lesson.discussion_prompt || "");
   };
 
   const handleDelete = async (lessonId: string) => {
