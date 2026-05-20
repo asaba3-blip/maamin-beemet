@@ -53,7 +53,7 @@ export function Header({
               <BookOpen className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-primary">{headerTitle}</h1>
+              <div className="text-xl font-bold text-primary">{headerTitle}</div>
               <p className="text-sm text-muted-foreground">{headerSubtitle}</p>
             </div>
           </div>

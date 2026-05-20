@@ -298,7 +298,7 @@ const Index = () => {
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Topics Sidebar */}
           <div className="lg:col-span-1">
@@ -345,7 +345,7 @@ const Index = () => {
             )}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

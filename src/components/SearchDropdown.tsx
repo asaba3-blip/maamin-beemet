@@ -141,6 +141,7 @@ export function SearchDropdown({
         <Input
           ref={inputRef}
           type="text"
+          aria-label="חיפוש שיעורים"
           placeholder="חיפוש שיעורים..."
           value={searchQuery}
           onChange={(e) => handleInputChange(e.target.value)}
