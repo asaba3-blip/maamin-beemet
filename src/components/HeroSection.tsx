@@ -14,6 +14,10 @@ export function HeroSection({
       <img 
         src={heroImage} 
         alt="לימוד תורה ויהדות - חכמת הדורות"
+        width={1920}
+        height={500}
+        fetchPriority="high"
+        decoding="async"
         className="w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
