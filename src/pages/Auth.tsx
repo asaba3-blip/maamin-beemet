@@ -11,6 +11,7 @@ import { BookOpen, Mail, Lock, LogIn, UserPlus } from "lucide-react";
 import { signUpSchema, signInSchema } from "@/lib/validation";
 import { useToast } from "@/hooks/use-toast";
 import { useCanonical } from "@/hooks/useCanonical";
+import { Helmet } from "react-helmet-async";
 
 export default function Auth() {
   useCanonical("/auth");
