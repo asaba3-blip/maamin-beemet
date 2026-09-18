@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Heart, MessageCircle, Calendar, Clock, Share2, Eye, Printer, Download } from "lucide-react";
 import { trackLessonView, formatViewCount } from "@/lib/viewTracker";
@@ -29,6 +29,7 @@ interface Lesson {
   content: string;
   image_url: string | null;
   created_at: string;
+  updated_at?: string | null;
   related_lessons?: string[];
   topic: {
     name: string;
@@ -53,6 +54,7 @@ export default function LessonDetail() {
   const { toast } = useToast();
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [relatedLessons, setRelatedLessons] = useState<RelatedLesson[]>([]);
+  const [moreLessons, setMoreLessons] = useState<RelatedLesson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const viewTrackedRef = useRef(false);
@@ -74,6 +76,25 @@ export default function LessonDetail() {
       });
     }
   }, [id, lesson]);
+
+  // Fetch a few other published lessons for internal linking (SEO + discovery)
+  useEffect(() => {
+    if (!id) return;
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("lessons")
+        .select("id, title, summary")
+        .eq("published", true)
+        .neq("id", id)
+        .order("created_at", { ascending: false })
+        .limit(4);
+      if (active && data) setMoreLessons(data);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [id]);
 
   const fetchLesson = async () => {
     try {
@@ -326,6 +347,7 @@ export default function LessonDetail() {
     headline: lesson.title,
     description: pageDescription,
     datePublished: lesson.created_at,
+    ...(lesson.updated_at ? { dateModified: lesson.updated_at } : {}),
     inLanguage: "he",
     mainEntityOfPage: lessonUrl,
     ...(lesson.image_url ? { image: lesson.image_url } : {}),
@@ -409,6 +431,11 @@ export default function LessonDetail() {
                 <span>{formatDate(lesson.created_at)}</span>
                 <Calendar className="h-4 w-4" />
               </div>
+              {lesson.updated_at && lesson.updated_at.slice(0, 10) !== lesson.created_at.slice(0, 10) && (
+                <div className="flex items-center gap-1">
+                  <span>עודכן: {formatDate(lesson.updated_at)}</span>
+                </div>
+              )}
             </div>
 
             <p className="text-lg text-muted-foreground leading-relaxed mb-6 font-body">
@@ -493,6 +520,28 @@ export default function LessonDetail() {
               )
             }
           />
+
+          {moreLessons.length > 0 && (
+            <section className="mt-12" aria-labelledby="more-lessons-heading">
+              <h2 id="more-lessons-heading" className="text-2xl font-heading font-bold mb-4 text-right">
+                שיעורים נוספים
+              </h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                {moreLessons.map((item) => (
+                  <Card key={item.id} className="h-full">
+                    <CardContent className="p-5 text-right">
+                      <h3 className="text-lg font-semibold mb-2">
+                        <Link to={`/lesson/${item.id}`} className="hover:underline">
+                          {item.title}
+                        </Link>
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-3">{item.summary}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
 
           <div className="text-center mt-8">
             <Button 

@@ -27,7 +27,6 @@ Deno.serve(async (req) => {
     }
 
     const baseUrl = 'https://maamin-beemet.co.il'
-    const today = new Date().toISOString().split('T')[0]
 
     // Build sitemap XML
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -36,7 +35,6 @@ Deno.serve(async (req) => {
     <!-- Homepage -->
     <url>
         <loc>${baseUrl}/</loc>
-        <lastmod>${today}</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
@@ -44,7 +42,6 @@ Deno.serve(async (req) => {
     <!-- Auth page -->
     <url>
         <loc>${baseUrl}/auth</loc>
-        <lastmod>${today}</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.3</priority>
     </url>
@@ -52,20 +49,20 @@ Deno.serve(async (req) => {
 
     // Add all published lessons
     for (const lesson of lessons || []) {
-      const lastmod = lesson.updated_at 
-        ? new Date(lesson.updated_at).toISOString().split('T')[0]
-        : today
-      
+      const lastmod = lesson.updated_at
+        ? `
+        <lastmod>${new Date(lesson.updated_at).toISOString().split('T')[0]}</lastmod>`
+        : ''
+
       sitemap += `
-    <!-- ${lesson.title} -->
     <url>
-        <loc>${baseUrl}/lesson/${lesson.id}</loc>
-        <lastmod>${lastmod}</lastmod>
+        <loc>${baseUrl}/lesson/${lesson.id}</loc>${lastmod}
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
 `
     }
+
 
     sitemap += `
 </urlset>`

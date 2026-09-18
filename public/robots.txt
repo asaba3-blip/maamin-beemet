@@ -14,3 +14,7 @@ Sitemap: https://maamin-beemet.co.il/sitemap.xml
 
 # Crawl delay (optional - helps with server load)
 Crawl-delay: 1
+
+# Block junk query-string URLs (not real pages)
+Disallow: /*?elementor_library=
+Disallow: /*?*elementor_library=
