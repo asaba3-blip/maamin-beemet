@@ -431,6 +431,11 @@ export default function LessonDetail() {
                 <span>{formatDate(lesson.created_at)}</span>
                 <Calendar className="h-4 w-4" />
               </div>
+              {lesson.updated_at && lesson.updated_at.slice(0, 10) !== lesson.created_at.slice(0, 10) && (
+                <div className="flex items-center gap-1">
+                  <span>עודכן: {formatDate(lesson.updated_at)}</span>
+                </div>
+              )}
             </div>
 
             <p className="text-lg text-muted-foreground leading-relaxed mb-6 font-body">
