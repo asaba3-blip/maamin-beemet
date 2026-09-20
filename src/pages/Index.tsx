@@ -57,7 +57,7 @@ const demoLessons = [
 
 const Index = () => {
   useCanonical("/");
-  const { user, isAdmin, isLoading } = useAuth();
+  const { user, isAdmin, isLoading, signOut } = useAuth();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
@@ -160,8 +160,8 @@ const Index = () => {
     setRealLessons(lessonsWithTopics);
   };
 
-  // Always use real lessons from database
-  const displayLessons = realLessons.length > 0 ? realLessons : lessons;
+  // Always use real lessons from database — never fall back to demo data
+  const displayLessons = realLessons;
 
   // Filter lessons based on search and topic
   const filteredLessons = displayLessons.filter((lesson) => {
@@ -273,10 +273,7 @@ const Index = () => {
         user={user}
         isAdmin={isAdmin}
         onAdminToggle={() => setShowAdmin(!showAdmin)}
-        onSignOut={async () => {
-          const { signOut } = useAuth();
-          await signOut();
-        }}
+        onSignOut={signOut}
         headerTitle={siteSettings.header_title || "לימודי מקרא ויהדות"}
         headerSubtitle={siteSettings.header_subtitle || "מקור לחכמה ותורה"}
       />
