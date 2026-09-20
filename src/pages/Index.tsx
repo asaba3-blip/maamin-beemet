@@ -11,50 +11,6 @@ import { AdminPanel } from "@/components/AdminPanel";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
-import lesson1Image from "@/assets/lesson1.jpg";
-import lesson2Image from "@/assets/lesson2.jpg";
-import lesson3Image from "@/assets/lesson3.jpg";
-
-// Demo data for lessons
-const demoLessons = [
-  {
-    id: "1",
-    title: "פרשת בראשית - בריאת העולם ומשמעותה",
-    summary: "שיעור מעמיק על סיפור הבריאה במקרא ומשמעותו הרוחנית והפילוסופית. נבחן את השאלות הגדולות על מקומו של האדם ביקום ותפקידו בעולם.",
-    image: lesson1Image,
-    topic: "פרשיות השבוע",
-    date: "25 באוג׳ 2024",
-    readTime: "15 דקות",
-    likes: 23,
-    comments: 8,
-    isLiked: false
-  },
-  {
-    id: "2", 
-    title: "עקרונות האמונה - יסודות הדת היהודית",
-    summary: "מבוא לעקרונות היסוד של האמונה היהודית על פי הרמב״ם. נלמד על שלושה עשר עיקרי האמונה ומשמעותם בחיינו היומיומיים.",
-    image: lesson2Image,
-    topic: "עקרונות האמונה",
-    date: "20 באוג׳ 2024", 
-    readTime: "12 דקות",
-    likes: 18,
-    comments: 5,
-    isLiked: true
-  },
-  {
-    id: "3",
-    title: "תהילים - שירי התפילה של דוד המלך",
-    summary: "עיון בספר תהילים ובמזמורים הנפוצים בתפילה. נבין את הרקע ההיסטורי, המשמעות הרוחנית והשפעתם על היהדות לדורותיה.",
-    image: lesson3Image,
-    topic: "ספרי חכמה",
-    date: "15 באוג׳ 2024",
-    readTime: "20 דקות", 
-    likes: 31,
-    comments: 12,
-    isLiked: false
-  }
-];
-
 const Index = () => {
   useCanonical("/");
   const { user, isAdmin, isLoading, signOut } = useAuth();
