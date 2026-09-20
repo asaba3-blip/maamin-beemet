@@ -11,57 +11,12 @@ import { AdminPanel } from "@/components/AdminPanel";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
-import lesson1Image from "@/assets/lesson1.jpg";
-import lesson2Image from "@/assets/lesson2.jpg";
-import lesson3Image from "@/assets/lesson3.jpg";
-
-// Demo data for lessons
-const demoLessons = [
-  {
-    id: "1",
-    title: "פרשת בראשית - בריאת העולם ומשמעותה",
-    summary: "שיעור מעמיק על סיפור הבריאה במקרא ומשמעותו הרוחנית והפילוסופית. נבחן את השאלות הגדולות על מקומו של האדם ביקום ותפקידו בעולם.",
-    image: lesson1Image,
-    topic: "פרשיות השבוע",
-    date: "25 באוג׳ 2024",
-    readTime: "15 דקות",
-    likes: 23,
-    comments: 8,
-    isLiked: false
-  },
-  {
-    id: "2", 
-    title: "עקרונות האמונה - יסודות הדת היהודית",
-    summary: "מבוא לעקרונות היסוד של האמונה היהודית על פי הרמב״ם. נלמד על שלושה עשר עיקרי האמונה ומשמעותם בחיינו היומיומיים.",
-    image: lesson2Image,
-    topic: "עקרונות האמונה",
-    date: "20 באוג׳ 2024", 
-    readTime: "12 דקות",
-    likes: 18,
-    comments: 5,
-    isLiked: true
-  },
-  {
-    id: "3",
-    title: "תהילים - שירי התפילה של דוד המלך",
-    summary: "עיון בספר תהילים ובמזמורים הנפוצים בתפילה. נבין את הרקע ההיסטורי, המשמעות הרוחנית והשפעתם על היהדות לדורותיה.",
-    image: lesson3Image,
-    topic: "ספרי חכמה",
-    date: "15 באוג׳ 2024",
-    readTime: "20 דקות", 
-    likes: 31,
-    comments: 12,
-    isLiked: false
-  }
-];
-
 const Index = () => {
   useCanonical("/");
-  const { user, isAdmin, isLoading } = useAuth();
+  const { user, isAdmin, isLoading, signOut } = useAuth();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
-  const [lessons, setLessons] = useState(demoLessons);
   const [topics, setTopics] = useState<any[]>([]);
   const [realLessons, setRealLessons] = useState<any[]>([]);
   const [showAdmin, setShowAdmin] = useState(false);
@@ -160,8 +115,8 @@ const Index = () => {
     setRealLessons(lessonsWithTopics);
   };
 
-  // Always use real lessons from database
-  const displayLessons = realLessons.length > 0 ? realLessons : lessons;
+  // Always use real lessons from database — never fall back to demo data
+  const displayLessons = realLessons;
 
   // Filter lessons based on search and topic
   const filteredLessons = displayLessons.filter((lesson) => {
@@ -273,10 +228,7 @@ const Index = () => {
         user={user}
         isAdmin={isAdmin}
         onAdminToggle={() => setShowAdmin(!showAdmin)}
-        onSignOut={async () => {
-          const { signOut } = useAuth();
-          await signOut();
-        }}
+        onSignOut={signOut}
         headerTitle={siteSettings.header_title || "לימודי מקרא ויהדות"}
         headerSubtitle={siteSettings.header_subtitle || "מקור לחכמה ותורה"}
       />
