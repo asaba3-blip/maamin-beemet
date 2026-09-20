@@ -17,7 +17,6 @@ const Index = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
-  const [lessons, setLessons] = useState(demoLessons);
   const [topics, setTopics] = useState<any[]>([]);
   const [realLessons, setRealLessons] = useState<any[]>([]);
   const [showAdmin, setShowAdmin] = useState(false);
