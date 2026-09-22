@@ -39,12 +39,6 @@ Deno.serve(async (req) => {
         <priority>1.0</priority>
     </url>
     
-    <!-- Auth page -->
-    <url>
-        <loc>${baseUrl}/auth</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.3</priority>
-    </url>
 `
 
     // Add all published lessons
