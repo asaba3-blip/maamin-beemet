@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -109,6 +110,9 @@ const AdminAnalytics = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8" dir="rtl">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="container mx-auto max-w-7xl">
         <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
           <div>

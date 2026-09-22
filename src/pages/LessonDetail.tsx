@@ -327,6 +327,9 @@ export default function LessonDetail() {
   if (!lesson) {
     return (
       <div className="min-h-screen flex items-center justify-center">
+        <Helmet>
+          <meta name="robots" content="noindex, follow" />
+        </Helmet>
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">השיעור לא נמצא</h1>
           <Button onClick={() => navigate("/")}>
