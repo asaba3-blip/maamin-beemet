@@ -19,4 +19,3 @@ Crawl-delay: 1
 Disallow: /*?elementor_library=
 Disallow: /*?*elementor_library=
 Disallow: /*?s=
-Disallow: /*?*s=
