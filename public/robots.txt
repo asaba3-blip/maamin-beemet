@@ -18,3 +18,5 @@ Crawl-delay: 1
 # Block junk query-string URLs (not real pages)
 Disallow: /*?elementor_library=
 Disallow: /*?*elementor_library=
+Disallow: /*?s=
+Disallow: /*?*s=
