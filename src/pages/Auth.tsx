@@ -142,6 +142,7 @@ export default function Auth() {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 flex items-center justify-center p-4">
       <Helmet>
         <title>התחברות - לימודי מקרא ויהדות</title>
+        <meta name="robots" content="noindex, follow" />
         <meta name="description" content="התחברות והרשמה לאתר לימודי מקרא ויהדות - גישה לשיעורים, תגובות וסימון מועדפים." />
         <meta property="og:title" content="התחברות - לימודי מקרא ויהדות" />
         <meta property="og:description" content="התחברות והרשמה לאתר לימודי מקרא ויהדות." />
