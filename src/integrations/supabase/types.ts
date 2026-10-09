@@ -101,6 +101,8 @@ export type Database = {
       }
       lessons: {
         Row: {
+          audio_duration_seconds: number | null
+          audio_url: string | null
           comments_count: number
           content: string
           created_at: string
@@ -117,6 +119,8 @@ export type Database = {
           views_count: number
         }
         Insert: {
+          audio_duration_seconds?: number | null
+          audio_url?: string | null
           comments_count?: number
           content: string
           created_at?: string
@@ -133,6 +137,8 @@ export type Database = {
           views_count?: number
         }
         Update: {
+          audio_duration_seconds?: number | null
+          audio_url?: string | null
           comments_count?: number
           content?: string
           created_at?: string

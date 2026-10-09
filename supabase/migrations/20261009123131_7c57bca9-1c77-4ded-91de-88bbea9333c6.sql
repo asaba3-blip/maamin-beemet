@@ -1,0 +1,1 @@
+ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS audio_url text, ADD COLUMN IF NOT EXISTS audio_duration_seconds integer;
