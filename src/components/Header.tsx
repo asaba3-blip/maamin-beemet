@@ -71,6 +71,9 @@ export function Header({
             <Button variant="ghost" size="sm">
               <span>דף הבית</span>
             </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/recordings">שיעורים מוקלטים</Link>
+            </Button>
             <Button variant="ghost" size="sm">
               <span>אודות</span>
             </Button>

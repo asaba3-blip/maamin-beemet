@@ -35,6 +35,7 @@ interface Lesson {
   created_at: string;
   related_lessons?: string[];
   discussion_prompt?: string | null;
+  audio_url?: string | null;
   topics?: Topic;
   lesson_topics?: Array<{
     topic_id: string;
@@ -65,6 +66,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState("");
   const [discussionPrompt, setDiscussionPrompt] = useState("");
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioUrl, setAudioUrl] = useState("");
 
   useEffect(() => {
     fetchTopics();
@@ -244,7 +247,30 @@ export function AdminPanel({ user }: AdminPanelProps) {
         }
       }
 
-      const lessonData = {
+      let finalAudioUrl: string | null = audioUrl || null;
+      let audioDuration: number | null = null;
+      if (audioFile) {
+        const ext = audioFile.name.split('.').pop() || 'mp3';
+        const audioPath = `audio/lesson-audio-${Date.now()}.${ext}`;
+        const { error: audioErr } = await supabase.storage
+          .from('lesson-images')
+          .upload(audioPath, audioFile, { contentType: audioFile.type || 'audio/mpeg' });
+        if (audioErr) {
+          toast({ title: "שגיאה", description: "לא ניתן להעלות את קובץ השמע", variant: "destructive" });
+          setIsLoading(false);
+          return;
+        }
+        finalAudioUrl = supabase.storage.from('lesson-images').getPublicUrl(audioPath).data.publicUrl;
+        audioDuration = await new Promise<number | null>((resolve) => {
+          const a = document.createElement('audio');
+          a.preload = 'metadata';
+          a.onloadedmetadata = () => resolve(isFinite(a.duration) ? Math.round(a.duration) : null);
+          a.onerror = () => resolve(null);
+          a.src = URL.createObjectURL(audioFile);
+        });
+      }
+
+      const lessonData: any = {
         title,
         summary,
         content: finalContent,
@@ -253,7 +279,10 @@ export function AdminPanel({ user }: AdminPanelProps) {
         published,
         related_lessons: relatedLessons,
         discussion_prompt: discussionPrompt.trim() || null,
+        audio_url: finalAudioUrl,
       };
+      if (audioFile) lessonData.audio_duration_seconds = audioDuration;
+      if (!finalAudioUrl) lessonData.audio_duration_seconds = null;
 
       let lessonId: string;
 
@@ -327,6 +356,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
       setImageFile(null);
       setImageUrl("");
       setDiscussionPrompt("");
+      setAudioFile(null);
+      setAudioUrl("");
       setEditingLesson(null);
       
       // Refresh lessons
@@ -359,6 +390,8 @@ export function AdminPanel({ user }: AdminPanelProps) {
     setPublished(lesson.published);
     setImageUrl(lesson.image_url || "");
     setDiscussionPrompt(lesson.discussion_prompt || "");
+    setAudioUrl(lesson.audio_url || "");
+    setAudioFile(null);
   };
 
   const handleDelete = async (lessonId: string) => {
@@ -552,6 +585,33 @@ export function AdminPanel({ user }: AdminPanelProps) {
               <p className="text-xs text-muted-foreground">
                 שאלה זו תופיע מעל אזור התגובות ותעודד את הקוראים להגיב. ({discussionPrompt.length}/300)
               </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="audio-upload">הקלטת שמע (אופציונלי, עד 50MB)</Label>
+              <Input
+                id="audio-upload"
+                type="file"
+                accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/*"
+                onChange={(e) => {
+                  const f = e.target.files?.[0] || null;
+                  if (f && f.size > 50 * 1024 * 1024) {
+                    toast({ title: "קובץ גדול מדי", description: "הגודל המרבי הוא 50MB", variant: "destructive" });
+                    e.target.value = "";
+                    return;
+                  }
+                  setAudioFile(f);
+                }}
+              />
+              {audioUrl && !audioFile && (
+                <div className="flex items-center gap-2">
+                  <audio controls preload="none" src={audioUrl} className="w-full" />
+                  <Button type="button" variant="outline" size="sm" onClick={() => setAudioUrl("")}>
+                    הסר הקלטה
+                  </Button>
+                </div>
+              )}
+              {audioFile && <p className="text-xs text-muted-foreground">ייעלה בשמירה: {audioFile.name}</p>}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

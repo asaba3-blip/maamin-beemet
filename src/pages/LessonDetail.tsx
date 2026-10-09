@@ -496,6 +496,15 @@ export default function LessonDetail() {
             </div>
           </header>
 
+          {(lesson as any).audio_url && (
+            <Card className="mb-6">
+              <CardContent className="p-5 text-right">
+                <h2 className="font-semibold mb-3">האזן לשיעור</h2>
+                <audio controls preload="none" src={(lesson as any).audio_url} className="w-full" />
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardContent className="prose prose-lg max-w-none p-8 text-right">
               <div 
