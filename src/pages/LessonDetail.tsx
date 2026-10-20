@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Heart, MessageCircle, Calendar, Clock, Share2, Eye, Printer, Download } from "lucide-react";
 import { trackLessonView, formatViewCount } from "@/lib/viewTracker";
+import { trackAudio, downloadAudio } from "@/lib/audioTracker";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -499,8 +500,14 @@ export default function LessonDetail() {
           {(lesson as any).audio_url && (
             <Card className="mb-6">
               <CardContent className="p-5 text-right">
-                <h2 className="font-semibold mb-3">האזן לשיעור</h2>
-                <audio controls preload="none" src={(lesson as any).audio_url} className="w-full" />
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-semibold">האזן לשיעור</h2>
+                  <Button variant="outline" size="sm" className="gap-1" onClick={() => downloadAudio(lesson.id, (lesson as any).audio_url, lesson.title)}>
+                    <Download className="h-4 w-4" />
+                    הורד הקלטה
+                  </Button>
+                </div>
+                <audio controls preload="none" src={(lesson as any).audio_url} className="w-full" onPlay={() => trackAudio(lesson.id, "play")} />
               </CardContent>
             </Card>
           )}

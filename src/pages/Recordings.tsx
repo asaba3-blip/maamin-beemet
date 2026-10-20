@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, Headphones } from "lucide-react";
+import { ArrowRight, Headphones, Download } from "lucide-react";
+import { trackAudio, downloadAudio } from "@/lib/audioTracker";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -80,8 +81,14 @@ export default function Recordings() {
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">{r.summary}</p>
-                  <audio controls preload="none" src={r.audio_url} className="w-full" />
-                  <Link to={`/lesson/${r.id}`} className="text-sm text-primary hover:underline">לשיעור הכתוב ←</Link>
+                  <audio controls preload="none" src={r.audio_url} className="w-full" onPlay={() => trackAudio(r.id, "play")} />
+                  <div className="flex items-center justify-between gap-2">
+                    <Link to={`/lesson/${r.id}`} className="text-sm text-primary hover:underline">לשיעור הכתוב ←</Link>
+                    <Button variant="outline" size="sm" className="gap-1" onClick={() => downloadAudio(r.id, r.audio_url, r.title)}>
+                      <Download className="h-4 w-4" />
+                      הורד הקלטה
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
