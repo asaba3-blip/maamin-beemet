@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      audio_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          lesson_id: string
+          visitor_hash: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          lesson_id: string
+          visitor_hash: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          lesson_id?: string
+          visitor_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_events_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           content: string
@@ -311,6 +343,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_audio_analytics: {
+        Args: never
+        Returns: {
+          downloads_today: number
+          downloads_total: number
+          downloads_week: number
+          lesson_id: string
+          lesson_title: string
+          plays_today: number
+          plays_total: number
+          plays_week: number
+        }[]
+      }
+      get_audio_daily: {
+        Args: { days_back?: number }
+        Returns: {
+          day: string
+          downloads: number
+          plays: number
+        }[]
+      }
       get_lesson_analytics: {
         Args: never
         Returns: {
