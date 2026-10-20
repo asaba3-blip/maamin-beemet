@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { AudioAnalytics } from "@/components/AudioAnalytics";
 import { Eye, Calendar, Clock, TrendingUp } from "lucide-react";
 import {
   LineChart,
@@ -244,6 +245,8 @@ const AdminAnalytics = () => {
             )}
           </CardContent>
         </Card>
+
+        <AudioAnalytics />
       </div>
     </div>
   );
