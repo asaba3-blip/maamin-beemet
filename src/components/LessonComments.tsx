@@ -71,12 +71,11 @@ export function LessonComments({ lessonId, discussionPrompt, onCountChange }: Pr
     let profileMap = new Map<string, { name: string; avatar: string | null }>();
 
     if (userIds.length > 0) {
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, display_name, avatar_url")
-        .in("user_id", userIds);
+      const { data: profiles } = await (supabase.rpc as any)("get_comment_author_profiles", {
+        p_user_ids: userIds,
+      });
 
-      profiles?.forEach((p) => {
+      (profiles as any[] | null)?.forEach((p: any) => {
         profileMap.set(p.user_id, {
           name: p.display_name || "משתמש",
           avatar: p.avatar_url,
