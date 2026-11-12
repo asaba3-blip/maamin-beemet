@@ -364,6 +364,14 @@ export type Database = {
           plays: number
         }[]
       }
+      get_comment_author_profiles: {
+        Args: { p_user_ids: string[] }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          user_id: string
+        }[]
+      }
       get_lesson_analytics: {
         Args: never
         Returns: {
