@@ -157,7 +157,18 @@ async function prerender() {
     await fs.writeFile(path.join(dir, 'index.html'), renderLessonHtml(template, lesson), 'utf8');
   }
 
-  console.log(`Prerendered ${lessons.length} lesson pages into dist/lesson/`);
+  const day = (d) => (d ? new Date(d).toISOString().slice(0, 10) : undefined);
+  const entries = [
+    { loc: `${BASE_URL}/`, freq: 'daily', pri: '1.0' },
+    { loc: `${BASE_URL}/recordings`, freq: 'weekly', pri: '0.8' },
+    ...lessons.map((l) => ({ loc: `${BASE_URL}/lesson/${l.id}`, mod: day(l.updated_at || l.created_at), freq: 'monthly', pri: '0.7' })),
+  ];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries
+    .map((e) => `  <url><loc>${e.loc}</loc>${e.mod ? `<lastmod>${e.mod}</lastmod>` : ''}<changefreq>${e.freq}</changefreq><priority>${e.pri}</priority></url>`)
+    .join('\n')}\n</urlset>\n`;
+  await fs.writeFile(path.join(distDir, 'sitemap.xml'), xml, 'utf8');
+
+  console.log(`Prerendered ${lessons.length} lesson pages and sitemap.xml into dist/`);
 }
 
 prerender().catch((error) => {
